@@ -2,7 +2,9 @@
 <div class="adf-property-value">
     <span *ngIf="!isEditable()">
         <span *ngIf="!isClickable(); else elseBlock" [attr.data-automation-id]="'card-textitem-value-' + property.key">
-            <span *ngIf="showProperty()" class="adf-textitem-ellipsis">{{ property.displayValue }}</span>
+            <span #valueToCopy *ngIf="showProperty()" class="adf-textitem-ellipsis">{{ property.displayValue }}
+            </span>
+            <button matSuffix *ngIf="isCopyable()" (click)="copyValueToClipboard()" style="font-size: 80%;">copy</button>
         </span>
         <ng-template #elseBlock>
             <div role="button" class="adf-textitem-clickable" [attr.data-automation-id]="'card-textitem-toggle-' + property.key" (click)="clicked()" fxLayout="row" fxLayoutAlign="space-between center">
@@ -30,7 +32,7 @@
             [attr.data-automation-id]="'card-textitem-toggle-' + property.key"
             fxLayout="row" fxLayoutAlign="space-between center">
             <span [attr.data-automation-id]="'card-textitem-value-' + property.key">
-                <span *ngIf="showProperty(); else elseEmptyValueBlock">{{ property.displayValue }}</span>
+                <span *ngIf="showProperty(); else elseEmptyValueBlock">{{ property.displayValue }} </span>
             </span>
 
             <button mat-icon-button fxFlex="0 0 auto"

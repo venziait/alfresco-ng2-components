@@ -19,6 +19,7 @@ import { Component, Input, OnChanges, ViewChild } from '@angular/core';
 import { CardViewTextItemModel } from '../../models/card-view-textitem.model';
 import { CardViewUpdateService } from '../../services/card-view-update.service';
 import { AppConfigService } from '../../../app-config/app-config.service';
+import { ClipboardService } from '../../../clipboard/clipboard.service';
 
 @Component({
     selector: 'adf-card-view-textitem',
@@ -38,6 +39,9 @@ export class CardViewTextItemComponent implements OnChanges {
     @Input()
     displayEmpty: boolean = true;
 
+    @Input()
+    copyable: boolean = true;
+
     @ViewChild('editorInput')
     private editorInput: any;
 
@@ -47,7 +51,8 @@ export class CardViewTextItemComponent implements OnChanges {
     valueSeparator: string;
 
     constructor(private cardViewUpdateService: CardViewUpdateService,
-                private appConfig: AppConfigService) {
+                private appConfig: AppConfigService,
+                private clipboardService: ClipboardService) {
         this.valueSeparator = this.appConfig.get<string>('content-metadata.multi-value-pipe-separator') || CardViewTextItemComponent.DEFAULT_SEPARATOR;
     }
 
@@ -69,6 +74,10 @@ export class CardViewTextItemComponent implements OnChanges {
 
     isClickable(): boolean {
         return !!this.property.clickable;
+    }
+
+    isCopyable(): boolean {
+        return this.copyable && !this.property.isEmpty();
     }
 
     hasIcon(): boolean {
@@ -132,5 +141,9 @@ export class CardViewTextItemComponent implements OnChanges {
         } else {
             this.cardViewUpdateService.clicked(this.property);
         }
+    }
+
+    copyValueToClipboard(): void {
+        this.clipboardService.copyContentToClipboard(this.property.value, 'Copied to clipboard');
     }
 }
