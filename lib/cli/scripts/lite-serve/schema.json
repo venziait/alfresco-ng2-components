@@ -1,0 +1,33 @@
+{
+  "title": "LiteServe builder",
+  "description": "Allows you to run a server with a specific dist folder.",
+  "type": "object",
+  "properties": {
+    "browserTarget": {
+      "type": "string",
+        "description": "Target to serve.",
+        "pattern": "^[^:\\s]+:[^:\\s]+(:[^\\s]+)?$"
+      },
+      "port": {
+        "type": "number",
+        "description": "Port to listen on.",
+        "default": 4200
+      },
+      "logLevel": {
+        "type": "string"
+      },
+      "watch": {
+        "type": "boolean",
+        "description": "Rebuild on change.",
+        "default": false
+      },
+      "open": {
+        "type": "boolean",
+        "description": "Opens the url in default browser.",
+        "default": false,
+        "alias": "o"
+      }
+  },
+  "additionalProperties": false,
+  "required": []
+}
