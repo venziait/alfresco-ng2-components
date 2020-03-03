@@ -118,6 +118,31 @@ describe('TaskListCloudComponent', () => {
         fixture.destroy();
     });
 
+    it('should display loading spinner', async(() => {
+        component.isLoading = true;
+        fixture.detectChanges();
+        fixture.whenStable().then(() => {
+            const spinner = fixture.debugElement.query(By.css('.mat-progress-spinner'));
+            expect(spinner).toBeDefined();
+        });
+    }));
+
+    it('should hide loading spinner upon loading complete', async(() => {
+        component.isLoading = true;
+        fixture.detectChanges();
+
+        let spinner = fixture.debugElement.query(By.css('.mat-progress-spinner'));
+        expect(spinner).toBeDefined();
+
+        component.isLoading = false;
+        fixture.detectChanges();
+
+        fixture.whenStable().then(() => {
+            spinner = fixture.debugElement.query(By.css('.mat-progress-spinner'));
+            expect(spinner).toBeNull();
+        });
+    }));
+
     it('should use the default schemaColumn as default', () => {
         component.ngAfterContentInit();
         expect(component.columns).toBeDefined();
