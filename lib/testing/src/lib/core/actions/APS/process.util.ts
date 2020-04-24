@@ -32,7 +32,7 @@ export class ProcessUtil {
         try {
             const appDefinition = await new ApplicationsUtil(this.api).getAppDefinitionByName(appName);
 
-            const processDefinition = await this.getProcessDefinitionByName(appDefinition.deploymentId, processDefinitionName);
+            const processDefinition = await this.getProcessDefinitionByName(appDefinition[0].deploymentId, processDefinitionName);
 
             const startProcessOptions: any = { processDefinitionId: processDefinition.id, name: processDefinitionName };
 
@@ -45,7 +45,7 @@ export class ProcessUtil {
     async startProcessOfApp(appName: string, processName?: string): Promise<any> {
         try {
             const appDefinition = await new ApplicationsUtil(this.api).getAppDefinitionByName(appName);
-            const processDefinitionList = await this.api.activiti.processApi.getProcessDefinitions({ deploymentId: appDefinition.deploymentId });
+            const processDefinitionList = await this.api.activiti.processApi.getProcessDefinitions({ deploymentId: appDefinition[0].deploymentId });
             const startProcessOptions: any = { processDefinitionId: processDefinitionList.data[0].id, name: processName ? processName : StringUtil.generateRandomString(5).toLowerCase() };
             return this.api.activiti.processApi.startNewProcessInstance(startProcessOptions);
         } catch (error) {
@@ -55,7 +55,7 @@ export class ProcessUtil {
 
     async cancelProcessInstance(processInstance: string): Promise<any> {
         try {
-            return this.api.activiti.processApi.deleteProcessInstance(processInstance);
+            return await this.api.activiti.processApi.deleteProcessInstance(processInstance);
         } catch (error) {
             Logger.error('Cancel Process - Service error, Response: ', JSON.parse(JSON.stringify(error)).response.text);
         }
