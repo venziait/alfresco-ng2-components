@@ -61,10 +61,18 @@ export abstract class DynamicComponentMapper {
 
         const existing = this.types[type];
         if (existing && !override) {
-            throw new Error(`already mapped, use override option if you intend replacing existing mapping.`);
+            return;
         }
 
         this.types[type] = resolver;
+    }
+
+    register(components: { [key: string]: DynamicComponentResolveFunction }, override: boolean = false) {
+        if (components) {
+            for (const type of Object.keys(components)) {
+                this.setComponentTypeResolver(type, components[type], override);
+            }
+        }
     }
 
     /**

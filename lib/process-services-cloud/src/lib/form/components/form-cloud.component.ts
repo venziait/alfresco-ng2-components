@@ -382,11 +382,13 @@ export class FormCloudComponent extends FormBaseComponent implements OnInit, OnC
     }
 
     ngOnInit() {
-        this.formRenderingService.setComponentTypeResolver('upload', () => AttachFileCloudWidgetComponent, true);
-        this.formRenderingService.setComponentTypeResolver('dropdown', () => DropdownCloudWidgetComponent, true);
-        this.formRenderingService.setComponentTypeResolver('date', () => DateCloudWidgetComponent, true);
-        this.formRenderingService.setComponentTypeResolver('people', () => PeopleCloudWidgetComponent, true);
-        this.formRenderingService.setComponentTypeResolver('functional-group', () => GroupCloudWidgetComponent, true);
+        this.formRenderingService.register({
+            'upload': () => AttachFileCloudWidgetComponent,
+            'dropdown': () => DropdownCloudWidgetComponent,
+            'date': () => DateCloudWidgetComponent,
+            'people': () => PeopleCloudWidgetComponent,
+            'functional-group': () => GroupCloudWidgetComponent
+        });
     }
 
     ngOnDestroy() {
