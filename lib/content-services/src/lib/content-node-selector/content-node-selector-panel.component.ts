@@ -34,6 +34,7 @@ import { ContentNodeSelectorService } from './content-node-selector.service';
 import { debounceTime, takeUntil } from 'rxjs/operators';
 import { CustomResourcesService } from '../document-list/services/custom-resources.service';
 import { ShareDataRow } from '../document-list';
+import { SelectionMode } from './content-node-selector.component-data.interface';
 import { Subject } from 'rxjs';
 
 export type ValidationFunction = (entry: Node) => boolean;
@@ -124,6 +125,12 @@ export class ContentNodeSelectorPanelComponent implements OnInit, OnDestroy {
     @Input()
     imageResolver: ImageResolver = null;
 
+    /**
+     * Define if the selection should be single or multiple
+     */
+    @Input()
+    selectionMode: SelectionMode = SelectionMode.SINGLE;
+
     /** Number of items shown per page in the list. */
     @Input()
     pageSize: number = this.DEFAULT_PAGINATION.maxItems;
@@ -194,7 +201,7 @@ export class ContentNodeSelectorPanelComponent implements OnInit, OnDestroy {
     showingSearchResults: boolean = false;
     loadingSearchResults: boolean = false;
     inDialog: boolean = false;
-    _chosenNode: Node = null;
+    _chosenNode: any [] = null;
     folderIdToShow: string | null = null;
     breadcrumbFolderTitle: string | null = null;
     startSiteGuid: string | null = null;
@@ -219,13 +226,9 @@ export class ContentNodeSelectorPanelComponent implements OnInit, OnDestroy {
                 private sitesService: SitesService) {
     }
 
-    set chosenNode(value: Node) {
+    set chosenNode(value: any []) {
         this._chosenNode = value;
-        let valuesArray = null;
-        if (value) {
-            valuesArray = [value];
-        }
-        this.select.next(valuesArray);
+        this.select.next(value);
     }
 
     get chosenNode() {
@@ -326,7 +329,7 @@ export class ContentNodeSelectorPanelComponent implements OnInit, OnDestroy {
         let folderNode: Node;
 
         if (this.showingSearchResults && this.chosenNode) {
-            folderNode = this.chosenNode;
+            folderNode = this.chosenNode[0];
         } else {
             folderNode = this.documentList.folderNode;
         }
@@ -428,7 +431,7 @@ export class ContentNodeSelectorPanelComponent implements OnInit, OnDestroy {
      */
     onFolderLoaded(): void {
         if (!this.showingSearchResults) {
-            this.attemptNodeSelection(this.documentList.folderNode);
+            this.attemptNodeSelection([this.documentList.folderNode]);
         }
     }
 
@@ -458,11 +461,15 @@ export class ContentNodeSelectorPanelComponent implements OnInit, OnDestroy {
      *
      * @param entry
      */
-    private attemptNodeSelection(entry: Node): void {
-        if (entry && this.isSelectionValid(entry)) {
-            this.chosenNode = entry;
-        } else {
-            this.resetChosenNode();
+    private attemptNodeSelection(entries: any[]): void {
+        const validSelection: any [] = [];
+        entries.map( (node: any) => {
+            if (node.entry && this.isSelectionValid(node.entry)) {
+                validSelection.push(node.entry);
+            }
+        });
+        if (validSelection.length > 0) {
+            this.chosenNode = validSelection ;
         }
     }
 
@@ -479,7 +486,7 @@ export class ContentNodeSelectorPanelComponent implements OnInit, OnDestroy {
      * @param event CustomEvent for node-select
      */
     onNodeSelect(event: any): void {
-        this.attemptNodeSelection(event.detail.node.entry);
+        this.attemptNodeSelection(event.detail.selection);
     }
 
     setTitleIfCustomSite(site: SiteEntry) {

@@ -26,4 +26,10 @@ export interface AttachFileWidgetDialogComponentData {
     context?: string;
     isSelectionValid?: (entry: Node) => boolean;
     showFilesInResult?: boolean;
+    selectionMode: SelectionMode;
+}
+
+export enum SelectionMode {
+    SINGLE = 'single',
+    MULTIPLE = 'multiple'
 }

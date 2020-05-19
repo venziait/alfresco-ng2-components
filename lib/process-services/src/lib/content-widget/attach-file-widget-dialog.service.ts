@@ -19,7 +19,7 @@ import { MatDialog } from '@angular/material';
 import { EventEmitter, Injectable, Output } from '@angular/core';
 import { TranslationService } from '@alfresco/adf-core';
 import { Subject, Observable } from 'rxjs';
-import { AttachFileWidgetDialogComponentData } from './attach-file-widget-dialog-component.interface';
+import { AttachFileWidgetDialogComponentData, SelectionMode } from './attach-file-widget-dialog-component.interface';
 import { Node } from '@alfresco/js-api';
 import { AttachFileWidgetDialogComponent } from './attach-file-widget-dialog.component';
 
@@ -42,7 +42,7 @@ export class AttachFileWidgetDialogService {
      * @param contentEntry Item to upload
      * @returns Information about the chosen file(s)
      */
-    openLogin(ecmHost: string, actionName?: string, context?: string): Observable<Node[]> {
+    openLogin(ecmHost: string, actionName?: string, context?: string, selectionMode?: SelectionMode): Observable<Node[]> {
         const selected = new Subject<Node[]>();
         selected.subscribe({
             complete: this.close.bind(this)
@@ -54,6 +54,7 @@ export class AttachFileWidgetDialogService {
             selected,
             ecmHost,
             context,
+            selectionMode,
             isSelectionValid: this.isNodeFile.bind(this),
             showFilesInResult: true
         };

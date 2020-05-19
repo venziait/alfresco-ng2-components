@@ -30,7 +30,7 @@ import {
     DownloadService,
     ContentService
 } from '@alfresco/adf-core';
-import { ContentNodeDialogService } from '@alfresco/adf-content-services';
+import { ContentNodeDialogService, SelectionMode } from '@alfresco/adf-content-services';
 import { Node, RelatedContentRepresentation, NodeChildAssociation } from '@alfresco/js-api';
 import { from, zip, of, Subject } from 'rxjs';
 import { mergeMap, takeUntil } from 'rxjs/operators';
@@ -205,16 +205,17 @@ export class AttachFileWidgetComponent extends UploadWidgetComponent implements 
         const accountIdentifier = 'alfresco-' + repository.id + '-' + repository.name;
         const currentECMHost = this.getDomainHost(this.appConfigService.get(AppConfigValues.ECMHOST));
         const chosenRepositoryHost = this.getDomainHost(repository.repositoryUrl);
+        const selectionMode = this.field.params.multiple ? SelectionMode.MULTIPLE : SelectionMode.SINGLE;
         if (chosenRepositoryHost !== currentECMHost) {
             const formattedRepositoryHost = repository.repositoryUrl.replace('/alfresco', '');
-            this.attachDialogService.openLogin(formattedRepositoryHost).subscribe(
+            this.attachDialogService.openLogin(formattedRepositoryHost, null, null, selectionMode).subscribe(
                 (selections: any[]) => {
                     selections.forEach((node) => node.isExternal = true);
                     this.tempFilesList.push(...selections);
                     this.uploadFileFromCS(selections, accountIdentifier);
                 });
         } else {
-            this.contentDialog.openFileBrowseDialogBySite().subscribe(
+            this.contentDialog.openFileBrowseDialogBySite(selectionMode).subscribe(
                 (selections: Node[]) => {
                     this.tempFilesList.push(...selections);
                     this.uploadFileFromCS(selections, accountIdentifier);

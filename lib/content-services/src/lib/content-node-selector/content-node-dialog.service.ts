@@ -23,7 +23,7 @@ import { ShareDataRow } from '../document-list/data/share-data-row.model';
 import { Node, NodeEntry, SitePaging } from '@alfresco/js-api';
 import { DocumentListService } from '../document-list/services/document-list.service';
 import { ContentNodeSelectorComponent } from './content-node-selector.component';
-import { ContentNodeSelectorComponentData } from './content-node-selector.component-data.interface';
+import { ContentNodeSelectorComponentData, SelectionMode } from './content-node-selector.component-data.interface';
 import { NodeLockDialogComponent } from '../dialogs/node-lock.dialog';
 import { switchMap } from 'rxjs/operators';
 
@@ -58,9 +58,9 @@ export class ContentNodeDialogService {
      * @param folderNodeId ID of the folder to use
      * @returns Information about the selected file(s)
      */
-    openFileBrowseDialogByFolderId(folderNodeId: string): Observable<Node[]> {
+    openFileBrowseDialogByFolderId(folderNodeId: string, selectionMode?: SelectionMode): Observable<Node[]> {
         return this.documentListService.getFolderNode(folderNodeId).pipe(switchMap((nodeEntry: NodeEntry) => {
-            return this.openUploadFileDialog('Choose', nodeEntry.entry, true);
+            return this.openUploadFileDialog('Choose', nodeEntry.entry, true, selectionMode);
         }));
     }
 
@@ -95,9 +95,9 @@ export class ContentNodeDialogService {
      * shows files and folders in the dialog search result.
      * @returns Information about the selected file(s)
      */
-    openFileBrowseDialogBySite(): Observable<Node[]> {
+    openFileBrowseDialogBySite(selectionMode?: SelectionMode): Observable<Node[]> {
         return this.siteService.getSites().pipe(switchMap((response: SitePaging) => {
-            return this.openFileBrowseDialogByFolderId(response.list.entries[0].entry.guid);
+            return this.openFileBrowseDialogByFolderId(response.list.entries[0].entry.guid, selectionMode);
         }));
     }
 
@@ -144,7 +144,8 @@ export class ContentNodeDialogService {
                 where: '(isFolder=true)',
                 isSelectionValid: this.isCopyMoveSelectionValid.bind(this),
                 excludeSiteContent: excludeSiteContent || ContentNodeDialogService.nonDocumentSiteContent,
-                select: select
+                select: select,
+                selectionMode: SelectionMode.SINGLE
             };
 
             this.openContentNodeDialog(data, 'adf-content-node-selector-dialog', '630px');
@@ -185,7 +186,8 @@ export class ContentNodeDialogService {
             imageResolver: this.imageResolver.bind(this),
             isSelectionValid: this.hasAllowableOperationsOnNodeFolder.bind(this),
             where: '(isFolder=true)',
-            select: select
+            select: select,
+            selectionMode: SelectionMode.SINGLE
         };
 
         this.openContentNodeDialog(data, 'adf-content-node-selector-dialog', '630px');
@@ -199,7 +201,7 @@ export class ContentNodeDialogService {
      * @param showFilesInResult Show files in dialog search result
      * @returns Information about the chosen file(s)
      */
-    openUploadFileDialog(action: string, contentEntry: Node, showFilesInResult = false): Observable<Node[]> {
+    openUploadFileDialog(action: string, contentEntry: Node, showFilesInResult = false, selectionMode?: SelectionMode): Observable<Node[]> {
         const select = new Subject<Node[]>();
         select.subscribe({
             complete: this.close.bind(this)
@@ -212,7 +214,8 @@ export class ContentNodeDialogService {
             imageResolver: this.imageResolver.bind(this),
             isSelectionValid: this.isNodeFile.bind(this),
             select: select,
-            showFilesInResult
+            showFilesInResult,
+            selectionMode: selectionMode
         };
 
         this.openContentNodeDialog(data, 'adf-content-node-selector-dialog', '630px');

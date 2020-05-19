@@ -34,4 +34,10 @@ export interface ContentNodeSelectorComponentData {
     showSearch?: boolean;
     showFilesInResult?: boolean;
     showDropdownSiteList?: boolean;
+    selectionMode?: SelectionMode;
+}
+
+export enum SelectionMode {
+    SINGLE = 'single',
+    MULTIPLE = 'multiple'
 }
