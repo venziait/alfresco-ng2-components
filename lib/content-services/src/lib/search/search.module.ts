@@ -73,15 +73,6 @@ import { SearchSortingPickerComponent } from './components/search-sorting-picker
         SearchCheckListComponent,
         SearchDateRangeComponent,
         SearchSortingPickerComponent
-    ],
-    entryComponents: [
-        SearchWidgetContainerComponent,
-        SearchTextComponent,
-        SearchRadioComponent,
-        SearchSliderComponent,
-        SearchNumberRangeComponent,
-        SearchCheckListComponent,
-        SearchDateRangeComponent
     ]
 })
 export class SearchModule {}

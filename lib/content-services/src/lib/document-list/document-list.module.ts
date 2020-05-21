@@ -63,13 +63,6 @@ import { FilterMenuComponent } from './components/filter-menu/filter-menu.compon
         NameColumnComponent,
         ContentActionComponent,
         ContentActionListComponent
-    ],
-    entryComponents: [
-        TrashcanNameColumnComponent,
-        LibraryStatusColumnComponent,
-        LibraryRoleColumnComponent,
-        LibraryNameColumnComponent,
-        NameColumnComponent
     ]
 })
 export class DocumentListModule {}
