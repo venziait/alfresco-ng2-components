@@ -91,8 +91,8 @@ describe('StartProcessCloudComponent', () => {
     });
 
     beforeEach(() => {
-        processService = TestBed.get(StartProcessCloudService);
-        formCloudService = TestBed.get(FormCloudService);
+        processService = TestBed.inject(StartProcessCloudService);
+        formCloudService = TestBed.inject(FormCloudService);
         fixture = TestBed.createComponent(StartProcessCloudComponent);
         component = fixture.componentInstance;
 

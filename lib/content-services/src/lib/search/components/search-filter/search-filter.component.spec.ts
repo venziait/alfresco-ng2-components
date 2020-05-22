@@ -59,9 +59,9 @@ describe('SearchFilterComponent', () => {
     });
 
     beforeEach(() => {
-        queryBuilder = TestBed.get(SearchQueryBuilderService);
+        queryBuilder = TestBed.inject(SearchQueryBuilderService);
         fixture = TestBed.createComponent(SearchFilterComponent);
-        appConfigService = TestBed.get(AppConfigService);
+        appConfigService = TestBed.inject(AppConfigService);
         const translationService = fixture.debugElement.injector.get(TranslationService);
         spyOn(translationService, 'instant').and.callFake((key) => key ? `${key}_translated` : null);
         component = fixture.componentInstance;

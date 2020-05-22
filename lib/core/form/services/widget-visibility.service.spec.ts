@@ -52,7 +52,7 @@ describe('WidgetVisibilityService', () => {
     });
 
     beforeEach(() => {
-        service = TestBed.get(WidgetVisibilityService);
+        service = TestBed.inject(WidgetVisibilityService);
         jasmine.Ajax.install();
     });
 

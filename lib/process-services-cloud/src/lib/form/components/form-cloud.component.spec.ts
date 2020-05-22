@@ -73,7 +73,7 @@ describe('FormCloudComponent', () => {
         const resolver = formRenderingService.getComponentTypeResolver(type);
         const widgetType = resolver(null);
 
-        const factoryResolver: ComponentFactoryResolver = TestBed.get(ComponentFactoryResolver);
+        const factoryResolver: ComponentFactoryResolver = TestBed.inject(ComponentFactoryResolver);
         const factory = factoryResolver.resolveComponentFactory(widgetType);
         const componentRef = factory.create(injector);
 
@@ -101,15 +101,15 @@ describe('FormCloudComponent', () => {
     });
 
     beforeEach(async(() => {
-        formRenderingService = TestBed.get(CloudFormRenderingService);
-        formCloudService = TestBed.get(FormCloudService);
+        formRenderingService = TestBed.inject(CloudFormRenderingService);
+        formCloudService = TestBed.inject(FormCloudService);
 
-        translateService = TestBed.get(TranslateService);
+        translateService = TestBed.inject(TranslateService);
 
-        visibilityService = TestBed.get(WidgetVisibilityService);
+        visibilityService = TestBed.inject(WidgetVisibilityService);
         spyOn(visibilityService, 'refreshVisibility').and.callThrough();
 
-        const appConfigService = TestBed.get(AppConfigService);
+        const appConfigService = TestBed.inject(AppConfigService);
         spyOn(appConfigService, 'get').and.returnValue([]);
 
         fixture = TestBed.createComponent(FormCloudComponent);

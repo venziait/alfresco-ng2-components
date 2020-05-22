@@ -47,7 +47,7 @@ describe('SearchTextInputComponent', () => {
         component = fixture.componentInstance;
         debugElement = fixture.debugElement;
         element = fixture.nativeElement;
-        userPreferencesService = TestBed.get(UserPreferencesService);
+        userPreferencesService = TestBed.inject(UserPreferencesService);
         component.focusListener = new Subject<any>();
     });
 
