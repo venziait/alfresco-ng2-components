@@ -24,17 +24,17 @@ const column = {
 
 export class PermissionsPage {
 
-    dataTableComponentPage: DataTableComponentPage = new DataTableComponentPage();
+    dataTableComponentPage = new DataTableComponentPage();
 
     addPermissionButton = element(by.css("button[data-automation-id='adf-add-permission-button']"));
     addPermissionDialog = element(by.css('adf-add-permission-dialog'));
     searchUserInput = element(by.id('searchInput'));
     searchResults = element(by.css('#adf-add-permission-authority-results #adf-search-results-content'));
     addButton = element(by.id('add-permission-dialog-confirm-button'));
-    permissionInheritedButton = element.all(by.css("div[class='app-inherit_permission_button'] button")).first();
-    noPermissions = element(by.css('div[id="adf-no-permissions-template"]'));
+    permissionInheritedButton = element.all(by.css('.app-inherit_permission_button button')).first();
+    noPermissions = element(by.id('adf-no-permissions-template'));
     deletePermissionButton = element(by.css(`button[data-automation-id='adf-delete-permission-button']`));
-    permissionDisplayContainer = element(by.css(`div[id='adf-permission-display-container']`));
+    permissionDisplayContainer = element(by.id('adf-permission-display-container'));
     closeButton = element(by.id('add-permission-dialog-close-button'));
 
     async clickCloseButton(): Promise<void> {
