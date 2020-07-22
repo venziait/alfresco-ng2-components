@@ -505,6 +505,12 @@ export class DataTableComponent implements AfterContentInit, OnChanges, DoCheck,
         }
     }
 
+    onDataTableEnterKeyDown(keyboardEvent: KeyboardEvent) {
+        if (keyboardEvent.key === 'Escape') {
+            this.resetSelection();
+        }
+    }
+
     onRowKeyUp(row: DataRow, keyboardEvent: KeyboardEvent) {
         const event = new CustomEvent('row-keyup', {
             detail: {

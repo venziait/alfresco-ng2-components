@@ -1,6 +1,7 @@
 <div
     role="grid"
     *ngIf="data" class="adf-full-width"
+    (keydown)="onDataTableEnterKeyDown($event)"
     [class.adf-datatable-card]="display === 'gallery'"
     [class.adf-datatable-list]="display === 'list'"
     [class.adf-sticky-header]="isStickyHeaderEnabled()"
