@@ -16,7 +16,7 @@
  */
 
 import { Component, OnChanges, Input, Output, EventEmitter, SimpleChanges, OnInit, OnDestroy } from '@angular/core';
-import { AbstractControl, FormGroup, FormBuilder } from '@angular/forms';
+import { AbstractControl, FormGroup, FormBuilder, FormControl } from '@angular/forms';
 import { DateAdapter } from '@angular/material/core';
 import { MatDialog } from '@angular/material/dialog';
 import { debounceTime, filter, takeUntil, finalize, switchMap } from 'rxjs/operators';
@@ -27,7 +27,7 @@ import { Moment } from 'moment';
 import { TaskFilterCloudModel, TaskFilterProperties, FilterOptions, TaskFilterAction } from './../models/filter-cloud.model';
 import { TaskFilterCloudService } from '../services/task-filter-cloud.service';
 import { TaskFilterDialogCloudComponent } from './task-filter-dialog-cloud.component';
-import { TranslationService, UserPreferencesService, UserPreferenceValues } from '@alfresco/adf-core';
+import { TranslationService, UserPreferencesService, UserPreferenceValues, IdentityUserModel, IdentityGroupModel } from '@alfresco/adf-core';
 import { AppsProcessCloudService } from '../../../app/services/apps-process-cloud.service';
 import { ApplicationInstanceModel } from '../../../app/models/application-instance.model';
 
@@ -309,6 +309,23 @@ export class EditTaskFilterCloudComponent implements OnInit, OnChanges, OnDestro
         }
     }
 
+    onAssignedChange(assignedValue: IdentityGroupModel[] | IdentityUserModel) {
+        const assigneeProperty = this.createTaskFilterProperties(this.taskFilter).find(property => property.key === 'assignee');
+        if (assigneeProperty && !this.editTaskFilterForm.get(assigneeProperty.key)) {
+            this.editTaskFilterForm.addControl('assignee', new FormControl(''));
+            this.editTaskFilterForm.updateValueAndValidity();
+        }
+
+        if (!Array.isArray(assignedValue) && assignedValue) {
+            this.getPropertyController(assigneeProperty).setValue(assignedValue.username);
+        } else if (!assignedValue) {
+            this.getPropertyController(assigneeProperty).setValue('');
+        } else {
+            const groupAssigneeProperty = this.createTaskFilterProperties(this.taskFilter).find(property => property.key === 'candidateGroups');
+            this.getPropertyController(groupAssigneeProperty).setValue(assignedValue);
+        }
+    }
+
     hasError(property: TaskFilterProperties): boolean {
         return this.getPropertyController(property).errors && this.getPropertyController(property).errors.invalid;
     }
@@ -447,6 +464,10 @@ export class EditTaskFilterCloudComponent implements OnInit, OnChanges, OnDestro
         return property.type === 'checkbox';
     }
 
+    isAssignemntType(property: TaskFilterProperties): boolean {
+        return property.type === 'assignment' && property.key === 'assignment';
+    }
+
     hasFormChanged(action: any): boolean {
         if (action.actionType === EditTaskFilterCloudComponent.ACTION_SAVE) {
             return !this.formHasBeenChanged;
@@ -526,6 +547,18 @@ export class EditTaskFilterCloudComponent implements OnInit, OnChanges, OnDestro
                 type: 'text',
                 key: 'assignee',
                 value: currentTaskFilter.assignee || ''
+            }),
+            new TaskFilterProperties({
+                label: 'ADF_CLOUD_EDIT_TASK_FILTER.LABEL.ASSIGNMENT',
+                type: 'assignment',
+                key: 'assignment',
+                value: currentTaskFilter.assignee || ''
+            }),
+            new TaskFilterProperties({
+                label: 'ADF_CLOUD_EDIT_TASK_FILTER.LABEL.CANDIDATE_GROUPS',
+                type: 'candidateGroups',
+                key: 'candidateGroups',
+                value: currentTaskFilter.candidateGroups || ''
             }),
             new TaskFilterProperties({
                 label: 'ADF_CLOUD_EDIT_TASK_FILTER.LABEL.PROCESS_INSTANCE_ID',

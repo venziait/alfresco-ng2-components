@@ -138,7 +138,8 @@
       "OWNER": "Owner",
       "DUE_DATE": "DueDate",
       "SORT": "Sort",
-      "START_DATE": "StartDate"
+      "START_DATE": "StartDate",
+      "CANDIDATE_GROUPS": "CandidateGroups"
     },
     "DIALOG": {
       "TITLE": "Save filter as",
@@ -264,6 +265,12 @@
         "UNCLAIM": "RELEASE"
       }
     }
+  },
+  "ADF_CLOUD_TASK_ASSIGNEMNT_FILTER": {
+    "ASSIGNED_TO_ME": "Assigned to me",
+    "UNASSIGNED": "Assigned to me",
+    "LIST_OF_CANDIDATE_USERS": "List of candidate users",
+    "ASSIGNEE": "Assignee",
+    "ASSIGNMENT_TYPE": "Assignment type"
   }
-
 }

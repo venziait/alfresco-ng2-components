@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+import { IdentityGroupModel } from '@alfresco/adf-core';
+
 export class TaskFilterCloudModel  {
     id: string;
     name: string;
@@ -38,6 +40,7 @@ export class TaskFilterCloudModel  {
     standalone: boolean;
     lastModifiedFrom: Date;
     lastModifiedTo: Date;
+    candidateGroups: IdentityGroupModel[];
 
     constructor(obj?: any) {
         if (obj) {
@@ -63,6 +66,7 @@ export class TaskFilterCloudModel  {
             this.standalone = obj.standalone || null;
             this.lastModifiedFrom = obj.lastModifiedFrom || null;
             this.lastModifiedTo = obj.lastModifiedTo || null;
+            this.candidateGroups = obj.candidateGroups || null;
         }
     }
 }
@@ -102,6 +106,12 @@ export class TaskFilterAction {
 export interface FilterOptions {
     label?: string;
     value?: string;
+}
+
+export enum AssignmentType {
+    CURRENT_USER = 'CURRENT_USER',
+    UNASSIGNED = 'UNASSIGNED',
+    CANDIDATE_GROUPS = 'CANDIDATE_GROUPS'
 }
 
 export class TaskFilterProperties {

@@ -269,7 +269,7 @@ export class TaskListCloudComponent extends DataTableSchema implements OnChanges
         this.size = pagination.maxItems;
         this.skipCount = pagination.skipCount;
         this.pagination.next(pagination);
-        this.reload();
+        // this.reload();
     }
 
     onSortingChanged(event: CustomEvent) {

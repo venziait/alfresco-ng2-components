@@ -27,6 +27,8 @@ import { EditTaskFilterCloudComponent } from './components/edit-task-filter-clou
 import { TaskFilterDialogCloudComponent } from './components/task-filter-dialog-cloud.component';
 import { AppListCloudModule } from './../../app/app-list-cloud.module';
 import { DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
+import { TaskAssignmentFilterCloudComponent } from './components/task-assignment-filter/task-assignment-filter.component';
+import { GroupCloudModule } from '../../group/group-cloud.module';
 
 @NgModule({
     imports: [
@@ -37,9 +39,10 @@ import { DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
         FlexLayoutModule,
         MaterialModule,
         AppListCloudModule,
+        GroupCloudModule,
         CoreModule
     ],
-    declarations: [TaskFiltersCloudComponent, EditTaskFilterCloudComponent, TaskFilterDialogCloudComponent],
+    declarations: [TaskFiltersCloudComponent, EditTaskFilterCloudComponent, TaskFilterDialogCloudComponent, TaskAssignmentFilterCloudComponent],
     exports: [TaskFiltersCloudComponent, EditTaskFilterCloudComponent],
     providers: [
         { provide: DateAdapter, useClass: MomentDateAdapter },

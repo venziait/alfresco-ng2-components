@@ -67,6 +67,11 @@
                         {{taskFilterProperty.label | translate}}
                     </mat-checkbox>
                     </div>
+
+                    <adf-cloud-task-assignment-filter
+                        *ngIf="isAssignemntType(taskFilterProperty)"
+                        [assignment]="taskFilterProperty.value"
+                        (assignedChange)="onAssignedChange($event)"></adf-cloud-task-assignment-filter>
                 </ng-container>
             </div>
             </form>
