@@ -32,7 +32,7 @@ export class ContentCloudNodeSelectorService {
     private dialog: MatDialog) {
   }
 
-  openUploadFileDialog(contentHost: string, currentFolderId?: string,  selectionMode?: string, showUploadButton?: boolean): Observable<Node[]> {
+  openUploadFileDialog(contentHost: string, currentFolderId?: string,  selectionMode?: string, showUploadButton?: boolean, multipleUpload?: boolean): Observable<Node[]> {
     const changedConfig = this.apiService.lastConfig;
     changedConfig.provider = 'ALL';
     changedConfig.hostEcm = contentHost.replace('/alfresco', '');
@@ -43,16 +43,16 @@ export class ContentCloudNodeSelectorService {
     });
     const data = <ContentNodeSelectorComponentData> {
       title: 'Select a file',
-      actionName: 'Choose',
+      actionName: 'Attach',
       currentFolderId,
       select,
       selectionMode,
       isSelectionValid: (entry: Node) => entry.isFile,
       showFilesInResult: true,
       showDropdownSiteList: false,
-      showUploadButton
-    };
-
+      showUploadButton,
+      multipleUpload
+  };
     this.openContentNodeDialog(data, 'adf-content-node-selector-dialog', '630px');
     return select;
   }
