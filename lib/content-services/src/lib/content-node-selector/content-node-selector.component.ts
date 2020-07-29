@@ -34,6 +34,7 @@ export class ContentNodeSelectorComponent {
     buttonActionName: string;
     chosenNode: Node[];
     currentDirectoryId: string;
+    localUploadedFiles: any[];
 
     constructor(private translation: TranslationService,
                 private notificationService: NotificationService,
@@ -81,5 +82,12 @@ export class ContentNodeSelectorComponent {
 
     onError(error) {
         this.notificationService.showError(error);
+    }
+
+    onLocalFilesUpload(uploaded: any) {
+        const files = [];
+        files.push(uploaded);
+        this.localUploadedFiles = files;
+        // console.log('files', this.localUploadedFiles);
     }
 }

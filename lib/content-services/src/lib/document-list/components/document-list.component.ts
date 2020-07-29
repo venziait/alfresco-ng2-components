@@ -97,6 +97,9 @@ export class DocumentListComponent implements OnInit, OnChanges, OnDestroy, Afte
     @ContentChild(CustomHeaderFilterTemplateDirective)
     customHeaderFilterTemplate: CustomHeaderFilterTemplateDirective;
 
+    @Input()
+    preSelectedNodes: any[] = [];
+
     /** Include additional information about the node in the server request. For example: association, isLink, isLocked and others. */
     @Input()
     includeFields: string[];
@@ -256,7 +259,7 @@ export class DocumentListComponent implements OnInit, OnChanges, OnDestroy, Afte
         if (this._currentFolderId !== currentFolderId) {
             this._currentFolderId = currentFolderId;
             if (this.data) {
-                this.data.loadPage(null, false);
+                this.data.loadPage(null, false, null, this.preSelectedNodes);
                 this.resetNewFolderPagination();
             }
 
@@ -476,7 +479,8 @@ export class DocumentListComponent implements OnInit, OnChanges, OnDestroy, Afte
             if (changes.node && changes.node.currentValue) {
                 const merge = this._pagination ? this._pagination.merge : false;
 
-                this.data.loadPage(changes.node.currentValue, merge);
+                this.data.loadPage(changes.node.currentValue, merge, null, this.preSelectedNodes);
+
                 this.onDataReady(changes.node.currentValue);
             } else if (changes.imageResolver) {
                 this.data.setImageResolver(changes.imageResolver.currentValue);
@@ -488,7 +492,7 @@ export class DocumentListComponent implements OnInit, OnChanges, OnDestroy, Afte
         this.ngZone.run(() => {
             this.resetSelection();
             if (this.node) {
-                this.data.loadPage(this.node, this._pagination.merge);
+                this.data.loadPage(this.node, this._pagination.merge, null, this.preSelectedNodes);
                 this.onDataReady(this.node);
             } else {
                 this.loadFolder();
@@ -678,7 +682,7 @@ export class DocumentListComponent implements OnInit, OnChanges, OnDestroy, Afte
 
     onPageLoaded(nodePaging: NodePaging) {
         if (nodePaging) {
-            this.data.loadPage(nodePaging, this._pagination.merge, this.allowDropFiles);
+            this.data.loadPage(nodePaging, this._pagination.merge, this.allowDropFiles, this.preSelectedNodes);
             this.setLoadingState(false);
             this.onDataReady(nodePaging);
         }

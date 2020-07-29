@@ -21,7 +21,8 @@
         [showFilesInResult]="data?.showFilesInResult"
         (select)="onSelect($event)"
         (siteChange)="onSiteChange($event)"
-        (navigationChange)="onNavigationChange($event)">
+        (navigationChange)="onNavigationChange($event)"
+        [preSelectedNodes]="localUploadedFiles">
     </adf-content-node-selector-panel>
 </mat-dialog-content>
 
@@ -32,6 +33,7 @@
             [staticTitle]="'FORM.FIELD.UPLOAD' | translate "
             [multipleFiles]="isMultipleSelection()"
             [rootFolderId]="currentDirectoryId"
+            (success)="onLocalFilesUpload($event)"
             (error)="onError($event)">
         </adf-upload-button>
     </div>

@@ -60,6 +60,9 @@ export class ContentNodeSelectorPanelComponent implements OnInit, OnDestroy {
     private showSearchField = true;
     private showFiles = false;
 
+    @Input()
+    preSelectedNodes: any;
+
     /** If true will restrict the search to the currentFolderId */
     @Input()
     restrictSearchToCurrentFolderId: boolean = false;
