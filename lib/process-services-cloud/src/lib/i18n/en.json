@@ -86,7 +86,8 @@
       "CREATED_DATE": "Created Date",
       "LAST_MODIFIED": "Last Modified",
       "CREATED": "Created",
-      "JSON_CELL": "Json"
+      "JSON_CELL": "Json",
+      "COMPLETED_BY": "Completed By"
     },
     "LIST": {
       "MESSAGES": {

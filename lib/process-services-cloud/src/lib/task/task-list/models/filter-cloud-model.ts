@@ -36,6 +36,7 @@ export class TaskQueryCloudRequestModel {
     processDefinitionId?: string;
     processInstanceId?: string;
     status?: string;
+    completedBy?: string;
     maxItems: number;
     skipCount: number;
     sorting?: TaskListCloudSortingModel[];
@@ -60,6 +61,7 @@ export class TaskQueryCloudRequestModel {
             this.processDefinitionId = obj.processDefinitionId;
             this.processInstanceId = obj.processInstanceId;
             this.status = obj.status;
+            this.completedBy = obj.completedBy;
             this.maxItems = obj.maxItems;
             this.skipCount = obj.skipCount;
             this.sorting = obj.sorting;
