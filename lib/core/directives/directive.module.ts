@@ -28,6 +28,7 @@ import { NodeRestoreDirective } from './node-restore.directive';
 import { UploadDirective } from './upload.directive';
 import { NodeDownloadDirective } from './node-download.directive';
 import { VersionCompatibilityDirective } from './version-compatibility.directive';
+import { DirectDownloadDirective } from './direct-download.directive';
 
 @NgModule({
     imports: [
@@ -43,7 +44,8 @@ import { VersionCompatibilityDirective } from './version-compatibility.directive
         NodeRestoreDirective,
         NodeDownloadDirective,
         UploadDirective,
-        VersionCompatibilityDirective
+        VersionCompatibilityDirective,
+        DirectDownloadDirective
     ],
     exports: [
         HighlightDirective,
@@ -54,7 +56,8 @@ import { VersionCompatibilityDirective } from './version-compatibility.directive
         NodeRestoreDirective,
         NodeDownloadDirective,
         UploadDirective,
-        VersionCompatibilityDirective
+        VersionCompatibilityDirective,
+        DirectDownloadDirective
     ]
 })
 export class DirectiveModule {}
