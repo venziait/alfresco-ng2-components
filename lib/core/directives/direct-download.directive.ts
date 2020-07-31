@@ -16,10 +16,9 @@
  */
 import { Directive, Input, HostListener } from '@angular/core';
 // import { MatDialog } from '@angular/material/dialog';
-import { AlfrescoApiService } from '@alfresco/adf-core';
+import { AlfrescoApiService, DownloadService } from '../services';
 // import { DownloadZipDialogComponent } from '../dialogs/download-zip/download-zip.dialog';
 import { NodeEntry, NodesApi } from '@alfresco/js-api';
-import { DownloadService } from '../services/download.service';
 
 @Directive({
     selector: '[adf-direct-download]'

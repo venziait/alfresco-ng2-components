@@ -114,6 +114,13 @@
                         <mat-icon>get_app</mat-icon>
                     </button>
                     <button mat-icon-button
+                            [disabled]="!hasSelection(documentList.selection)"
+                            title="{{ 'DOCUMENT_LIST.TOOLBAR.DOWNLOAD' | translate }}"
+                            [adf-direct-download]="documentList.selection"
+                            matTooltip="{{ 'DOCUMENT_LIST.TOOLBAR.DOWNLOAD' | translate }}">
+                        <mat-icon>cloud_download</mat-icon>
+                    </button>
+                    <button mat-icon-button
                             data-automation-id="delete-toolbar-button"
                             adf-check-allowable-operation="delete"
                             permanent=true
@@ -229,7 +236,7 @@
                 [sortingMode]="sortingMode"
                 [showHeader]="showHeader"
                 [thumbnails]="thumbnails"
-                [stickyHeader]="stickyHeader" 
+                [stickyHeader]="stickyHeader"
                 (error)="onNavigationError($event)"
                 (success)="resetError()"
                 (ready)="emitReadyEvent($event)"
