@@ -63,6 +63,10 @@ export class VersionManagerComponent implements OnInit {
     @Input()
     allowDownload = true;
 
+    /** Enable/disable downloading a version of the current node via direct access url. */
+    @Input()
+    allowDirectDownload = true;
+
     /** Emitted when a file is uploaded successfully. */
     @Output()
     uploadSuccess: EventEmitter<Node> = new EventEmitter<Node>();

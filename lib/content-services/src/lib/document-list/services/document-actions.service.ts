@@ -86,6 +86,7 @@ export class DocumentActionsService {
         this.handlers['move'] = this.moveNode.bind(this);
         this.handlers['delete'] = this.deleteNode.bind(this);
         this.handlers['download'] = this.downloadNode.bind(this);
+        this.handlers['direct-download'] = this.directDownload.bind(this);
         this.handlers['lock'] = this.lockNode.bind(this);
     }
 
@@ -95,6 +96,10 @@ export class DocumentActionsService {
 
     private downloadNode(obj: NodeEntry) {
         this.nodeActionsService.downloadNode(obj);
+    }
+
+    private directDownload(obj: NodeEntry) {
+        this.nodeActionsService.directDownloadNode(obj);
     }
 
     private copyNode(node: NodeEntry, _target?: any, permission?: string) {

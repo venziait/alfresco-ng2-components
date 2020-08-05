@@ -88,6 +88,18 @@
                 </button>
 
                 <button
+                    id="adf-viewer--direct-download"
+                    *ngIf="allowDirectDownload"
+                    mat-icon-button
+                    [attr.aria-label]="'ADF_VIEWER.ACTIONS.DOWNLOAD' | translate"
+                    title="{{ 'ADF_VIEWER.ACTIONS.DOWNLOAD' | translate }}"
+                    data-automation-id="adf-toolbar-download"
+                    [adf-direct-download]="nodeEntry"
+                    [version]="versionEntry">
+                    <mat-icon>cloud_download</mat-icon>
+                </button>
+
+                <button
                     id="adf-viewer-print"
                     *ngIf="allowPrint"
                     mat-icon-button

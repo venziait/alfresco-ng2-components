@@ -33,6 +33,12 @@
                         (click)="downloadVersion(version.entry.id)">
                     {{ 'ADF_VERSION_LIST.ACTIONS.DOWNLOAD' | translate }}
                 </button>
+                <button *ngIf="allowDirectDownload"
+                        [id]="'adf-version-list-action-direct-download-'+version.entry.id"
+                        mat-menu-item
+                        (click)="directDownloadVersion(version.entry.id)">
+                    Direct Download
+                </button>
                 <button
                     [disabled]="!canDelete()"
                     [id]="'adf-version-list-action-delete-'+version.entry.id"

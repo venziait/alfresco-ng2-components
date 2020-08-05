@@ -17,9 +17,10 @@
 
 import { AlfrescoApiService, ContentService } from '@alfresco/adf-core';
 import { Component, Input, OnChanges, ViewEncapsulation, EventEmitter, Output } from '@angular/core';
-import { VersionsApi, Node, VersionEntry, VersionPaging } from '@alfresco/js-api';
+import { VersionsApi, Node, VersionEntry, VersionPaging, NodesApi, DirectAccessUrlEntry } from '@alfresco/js-api';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../dialogs/confirm.dialog';
+import { from, Observable } from 'rxjs';
 
 @Component({
     selector: 'adf-version-list',
@@ -47,6 +48,10 @@ export class VersionListComponent implements OnChanges {
     /** Enable/disable downloading a version of the current node. */
     @Input()
     allowDownload = true;
+
+    /** Enable/disable downloading a version of the current node directly from s3/azure. */
+    @Input()
+    allowDirectDownload = false;
 
     /** Enable/disable viewing a version of the current node. */
     @Input()
@@ -119,6 +124,14 @@ export class VersionListComponent implements OnChanges {
         }
     }
 
+    directDownloadVersion(versionId: string) {
+        if (this.allowDirectDownload) {
+            this.getDirectAccessContentUrl(this.node.id, versionId).subscribe((urlEntry: DirectAccessUrlEntry) => {
+                this.downloadContent(urlEntry.entry.contentUrl);
+            });
+        }
+    }
+
     deleteVersion(versionId: string) {
         if (this.canUpdate()) {
             const dialogRef = this.dialog.open(ConfirmDialogComponent, {
@@ -154,6 +167,11 @@ export class VersionListComponent implements OnChanges {
     private getVersionContentUrl(nodeId: string, versionId: string, attachment?: boolean) {
         const nodeDownloadUrl = this.alfrescoApi.contentApi.getContentUrl(nodeId, attachment);
         return nodeDownloadUrl.replace('/content', '/versions/' + versionId + '/content');
+    }
+
+    private getDirectAccessContentUrl(nodeId: string, versionId: string, opts?: any): Observable<DirectAccessUrlEntry> {
+        const newNodesApi = new NodesApi(this.alfrescoApi.getInstance());
+        return from(newNodesApi.requestContentUrl_2(nodeId, versionId, opts));
     }
 
     downloadContent(url: string) {

@@ -13,10 +13,18 @@
 </section>
 
 <section>
+    <mat-slide-toggle id="adf-version-manager-switch--direct download" color="primary" [(ngModel)]="allowDirectDownload">
+        Direct Download
+    </mat-slide-toggle>
+</section>
+
+<section>
     <mat-slide-toggle id="adf-version-manager-switch-comments" color="primary" [(ngModel)]="showComments">
         {{'APP.ADF_VERSION_MANAGER.COMMENTS' | translate}}
     </mat-slide-toggle>
 </section>
+
+
 
 <section *ngIf="newFileVersion">
     <mat-slide-toggle id="adf-version-manager-switch-comparison" color="primary" [(ngModel)]="showVersionComparison">
@@ -31,6 +39,7 @@
                          [showVersionComparison]="showVersionComparison"
                          [newFileVersion]="newFileVersion"
                          [allowDownload]="allowDownload"
+                         [allowDirectDownload]="allowDirectDownload"
                          [showComments]="showComments"
                          (uploadError)="uploadError($event)"
                          (viewVersion)="onViewVersion($event)"

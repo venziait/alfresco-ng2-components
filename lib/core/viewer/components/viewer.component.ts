@@ -109,6 +109,10 @@ export class ViewerComponent implements OnChanges, OnInit, OnDestroy {
     @Input()
     allowDownload = true;
 
+    /** Toggle direct access link downloading */
+    @Input()
+    allowDirectDownload = false;
+
     /** Toggles printing. */
     @Input()
     allowPrint = false;

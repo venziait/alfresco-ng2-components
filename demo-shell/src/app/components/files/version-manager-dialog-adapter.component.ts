@@ -32,6 +32,7 @@ export class VersionManagerDialogAdapterComponent {
 
     showComments = true;
     allowDownload = true;
+    allowDirectDownload = false;
     readOnly = false;
     showVersionComparison = false;
 
@@ -43,6 +44,7 @@ export class VersionManagerDialogAdapterComponent {
         this.newFileVersion = data.hasOwnProperty('newFileVersion') ? data.newFileVersion : this.newFileVersion;
         this.showComments = data.hasOwnProperty('showComments') ? data.showComments : this.showComments;
         this.allowDownload = data.hasOwnProperty('allowDownload') ? data.allowDownload : this.allowDownload;
+        this.allowDirectDownload = data.hasOwnProperty('allowDirectDownload') ? data.allowDirectDownload : this.allowDirectDownload;
     }
 
     uploadError(errorMessage: string) {

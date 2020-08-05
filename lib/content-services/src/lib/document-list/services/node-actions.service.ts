@@ -18,7 +18,7 @@
 import { Injectable, Output, EventEmitter } from '@angular/core';
 import { Node, NodeEntry } from '@alfresco/js-api';
 import { Subject } from 'rxjs';
-import { AlfrescoApiService, ContentService, NodeDownloadDirective, DownloadService } from '@alfresco/adf-core';
+import { AlfrescoApiService, ContentService, NodeDownloadDirective, DownloadService, DirectDownloadDirective } from '@alfresco/adf-core';
 import { MatDialog } from '@angular/material/dialog';
 
 import { DocumentListService } from './document-list.service';
@@ -43,6 +43,11 @@ export class NodeActionsService {
 
     downloadNode(node: NodeEntry) {
         new NodeDownloadDirective(this.apiService, this.downloadService, this.dialog)
+            .downloadNode(node);
+    }
+
+    directDownloadNode(node: NodeEntry) {
+        new DirectDownloadDirective(this.apiService, this.downloadService, this.dialog)
             .downloadNode(node);
     }
 

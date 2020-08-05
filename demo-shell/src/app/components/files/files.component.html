@@ -113,7 +113,7 @@
                             matTooltip="{{ 'DOCUMENT_LIST.TOOLBAR.DOWNLOAD' | translate }}">
                         <mat-icon>get_app</mat-icon>
                     </button>
-                    <button mat-icon-button
+                    <button *ngIf="allowDirectDownload" mat-icon-button
                             [disabled]="!hasSelection(documentList.selection)"
                             title="{{ 'DOCUMENT_LIST.TOOLBAR.DOWNLOAD' | translate }}"
                             [adf-direct-download]="documentList.selection"
@@ -391,6 +391,12 @@
                         handler="download">
                     </content-action>
                     <content-action
+                        [visible]="allowDirectDownload"
+                        icon="cloud_download"
+                        title="Direct Download"
+                        handler="direct-download">
+                    </content-action>
+                    <content-action
                         icon="content_copy"
                         title="DOCUMENT_LIST.ACTIONS.FOLDER.COPY"
                         permission="copy"
@@ -487,7 +493,8 @@
                                 <adf-version-manager
                                     [node]="documentList.selection[0].entry"
                                     [showComments]="showVersionComments"
-                                    [allowDownload]="allowVersionDownload">
+                                    [allowDownload]="allowVersionDownload"
+                                    [allowDirectDownload]="allowDirectDownload">
                                 </adf-version-manager>
                             </ng-container>
                         </ng-container>
@@ -614,7 +621,11 @@
                 {{'APP.ADF_VERSION_MANAGER.ALLOW_DOWNLOAD' | translate}}
             </mat-slide-toggle>
         </section>
-
+        <section>
+            <mat-slide-toggle color="primary" [(ngModel)]="allowDirectDownload">
+                Enable Direct Access Download
+            </mat-slide-toggle>
+        </section>
         <section>
             <mat-slide-toggle color="primary" [(ngModel)]="warnOnMultipleUploads">
                 {{'APP.WARN-MULTIPLE-UPLOADS' | translate}}
