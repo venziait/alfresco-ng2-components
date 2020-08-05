@@ -17,21 +17,21 @@
 
 import { Component, Inject, ViewEncapsulation } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { DownloadEntry } from '@alfresco/js-api';
+import { DownloadEntry, DirectAccessUrlEntry } from '@alfresco/js-api';
 import { LogService } from '../../services/log.service';
 import { DownloadZipService } from '../../services/download-zip.service';
 import { AbstractDownloadZipDialogComponent } from './abstract-download-zip.dialog';
 
 @Component({
-    selector: 'adf-download-zip-dialog',
+    selector: 'adf-direct-download-zip-dialog',
     templateUrl: './download-zip.dialog.html',
     styleUrls: ['./download-zip.dialog.scss'],
-    host: { 'class': 'adf-download-zip-dialog' },
+    host: { 'class': 'adf-direct-download-zip-dialog' },
     encapsulation: ViewEncapsulation.None
 })
-export class DownloadZipDialogComponent extends AbstractDownloadZipDialogComponent {
+export class DirectDownloadZipDialogComponent extends AbstractDownloadZipDialogComponent {
 
-    constructor(dialogRef: MatDialogRef<DownloadZipDialogComponent>,
+    constructor(dialogRef: MatDialogRef<DirectDownloadZipDialogComponent>,
                 @Inject(MAT_DIALOG_DATA)
                 public data: any,
                 logService: LogService,
@@ -39,6 +39,11 @@ export class DownloadZipDialogComponent extends AbstractDownloadZipDialogCompone
         super(dialogRef, data, logService, downloadZipService);
     }
 
+    directDownload(nodeId: string, fileName: string): void {
+        this.downloadZipService.getDirectAccessUrl(nodeId).subscribe((urlEntry: DirectAccessUrlEntry) => {
+            this.download(urlEntry.entry.contentUrl, fileName);
+        });
+    }
     waitAndDownload(downloadId: string, fileName: string): void {
         if (this.cancelled) {
             return;
@@ -47,8 +52,7 @@ export class DownloadZipDialogComponent extends AbstractDownloadZipDialogCompone
         this.downloadZipService.getDownload(downloadId).subscribe((downloadEntry: DownloadEntry) => {
             if (downloadEntry.entry) {
                 if (downloadEntry.entry.status === 'DONE') {
-                    const url = this.downloadZipService.getContentUrl(downloadId, true);
-                    this.download(url, fileName);
+                    this.directDownload(downloadId, fileName);
                 } else {
                     setTimeout(() => {
                         this.waitAndDownload(downloadId, fileName);

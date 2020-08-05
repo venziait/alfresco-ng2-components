@@ -22,6 +22,7 @@ import { MaterialModule } from '../material.module';
 import { DownloadZipDialogComponent } from './download-zip/download-zip.dialog';
 import { TranslateModule } from '@ngx-translate/core';
 import { PipeModule } from '../pipes/pipe.module';
+import { DirectDownloadZipDialogComponent } from './download-zip/direct-download-zip.dialog';
 
 @NgModule({
     imports: [
@@ -31,10 +32,12 @@ import { PipeModule } from '../pipes/pipe.module';
         PipeModule
     ],
     declarations: [
-        DownloadZipDialogComponent
+        DownloadZipDialogComponent,
+        DirectDownloadZipDialogComponent
     ],
     exports: [
-        DownloadZipDialogComponent
+        DownloadZipDialogComponent,
+        DirectDownloadZipDialogComponent
     ]
 })
 export class DialogModule {}

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { NodeEntry, DownloadEntry, DownloadBodyCreate } from '@alfresco/js-api';
+import { NodeEntry, DownloadEntry, DownloadBodyCreate, NodesApi, DirectAccessUrlEntry } from '@alfresco/js-api';
 import { Injectable } from '@angular/core';
 import { Observable, from, throwError } from 'rxjs';
 import { LogService } from './log.service';
@@ -52,6 +52,19 @@ export class DownloadZipService {
         return this.apiService.getInstance().content.getContentUrl(nodeId, attachment);
     }
 
+    /**
+     * Gets a direct access URL for the given node.
+     * @param nodeId Node to get URL for.
+     * @param opts Optional parameters
+     *
+     * @returns DirectAccessUrl
+     */
+    getDirectAccessUrl(nodeId: string, opts?: any): Observable<DirectAccessUrlEntry> {
+        const newNodesApi = new NodesApi(this.apiService.getInstance());
+        return from(newNodesApi.requestContentUrl(nodeId, opts)).pipe(
+            catchError((err) => this.handleError(err))
+        );
+    }
     /**
      * Gets a Node via its node ID.
      * @param nodeId ID of the target node
