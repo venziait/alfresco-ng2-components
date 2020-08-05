@@ -15,15 +15,14 @@
  * limitations under the License.
  */
 
-import { Inject, OnInit, Component } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { OnInit, Component, Inject } from '@angular/core';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { DownloadEntry, NodeEntry } from '@alfresco/js-api';
 import { LogService } from '../../services/log.service';
 import { DownloadZipService } from '../../services/download-zip.service';
 
 @Component({
-    templateUrl: './download-zip.dialog.html',
-    styleUrls: ['./download-zip.dialog.scss']
+    template: ''
 })
 export abstract class AbstractDownloadZipDialogComponent implements OnInit {
 
