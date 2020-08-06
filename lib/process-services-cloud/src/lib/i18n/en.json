@@ -161,13 +161,14 @@
       "PROCESS_DEF_ID": "ProcessDefinitionId",
       "PROCESS_DEF_NAME": "ProcessDefinitionName",
       "PROCESS_DEF_KEY": "ProcessDefinitionKey",
-      "LAST_MODIFIED": "LastModified",
+      "LAST_MODIFIED": "Last Modified",
       "LAST_MODIFIED_DATE_FORM": "LastModifiedFrom",
       "LAST_MODIFIED_TO": "LastModifiedTo",
       "PROCESS_NAME": "Process Name",
       "APP_VERSION": "AppReleaseVersion",
       "ID": "Id",
-      "START_DATE": "Start Date"
+      "START_DATE": "Start Date",
+      "BUSINESS_KEY": "Business Key"
     },
     "ERROR": {
       "DATE": "Date format DD/MM/YYYY"
