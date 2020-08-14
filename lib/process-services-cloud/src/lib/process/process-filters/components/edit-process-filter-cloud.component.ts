@@ -86,6 +86,10 @@ export class EditProcessFilterCloudComponent implements OnInit, OnChanges, OnDes
     @Input()
     showTitle = true;
 
+     /** Toggles the appearance of the process filter name . */
+    @Input()
+    showProcessFilterName = true;
+
     /** Emitted when a process instance filter property changes. */
     @Output()
     filterChange: EventEmitter<ProcessFilterCloudModel> = new EventEmitter();
@@ -111,6 +115,7 @@ export class EditProcessFilterCloudComponent implements OnInit, OnChanges, OnDes
         EditProcessFilterCloudComponent.ACTION_DELETE
     ];
     applicationNames: any[] = [];
+    allProcessDefinitionNamesOption = { label: 'All', value: '' };
     processDefinitionNames: any[] = [];
     formHasBeenChanged = false;
     editProcessFilterForm: FormGroup;
@@ -330,6 +335,7 @@ export class EditProcessFilterCloudComponent implements OnInit, OnChanges, OnDes
         .pipe(takeUntil(this.onDestroy$))
         .subscribe((processDefinitions: ProcessDefinitionCloud[]) => {
             if (processDefinitions && processDefinitions.length > 0) {
+                this.processDefinitionNames.push(this.allProcessDefinitionNamesOption);
                 processDefinitions.map((processDefinition) => {
                     this.processDefinitionNames.push({ label: processDefinition.name, value: processDefinition.name });
                 });

@@ -149,11 +149,26 @@ describe('SearchHeaderComponent', () => {
         await fixture.whenStable();
     });
 
+    it('should execute a new query when a new sorting is requested', async (done) => {
+        spyOn(alfrescoApiService.searchApi, 'search').and.returnValue(Promise.resolve(fakeNodePaging));
+        spyOn(queryBuilder, 'buildQuery').and.returnValue({});
+        component.update.subscribe((newNodePaging) => {
+            expect(newNodePaging).toBe(fakeNodePaging);
+            done();
+        });
+
+        const skipCount = new SimpleChange(null, '123-asc', false);
+        component.ngOnChanges({ 'sorting': skipCount });
+        fixture.detectChanges();
+        await fixture.whenStable();
+    });
+
     it('should emit the clear event when no filter has been selected', async (done) => {
         spyOn(queryBuilder, 'isNoFilterActive').and.returnValue(true);
         spyOn(alfrescoApiService.searchApi, 'search').and.returnValue(Promise.resolve(fakeNodePaging));
         spyOn(queryBuilder, 'buildQuery').and.returnValue({});
         spyOn(component.widgetContainer, 'resetInnerWidget').and.stub();
+        spyOn(component, 'isActive').and.returnValue(true);
         const fakeEvent = jasmine.createSpyObj('event', ['stopPropagation']);
         component.clear.subscribe(() => {
             done();
@@ -173,6 +188,7 @@ describe('SearchHeaderComponent', () => {
         spyOn(queryBuilder, 'isNoFilterActive').and.returnValue(false);
         spyOn(alfrescoApiService.searchApi, 'search').and.returnValue(Promise.resolve(fakeNodePaging));
         spyOn(queryBuilder, 'buildQuery').and.returnValue({});
+        spyOn(component, 'isActive').and.returnValue(true);
         queryBuilder.queryFragments['fake'] = 'test';
         spyOn(component.widgetContainer, 'resetInnerWidget').and.callThrough();
         const fakeEvent = jasmine.createSpyObj('event', ['stopPropagation']);
@@ -195,6 +211,7 @@ describe('SearchHeaderComponent', () => {
         spyOn(queryBuilder, 'isNoFilterActive').and.returnValue(true);
         spyOn(alfrescoApiService.searchApi, 'search').and.returnValue(Promise.resolve(fakeNodePaging));
         spyOn(queryBuilder, 'buildQuery').and.returnValue({});
+        spyOn(component, 'isActive').and.returnValue(true);
         spyOn(component.widgetContainer, 'resetInnerWidget').and.stub();
         component.widgetContainer.componentRef.instance.value = '';
         const fakeEvent = jasmine.createSpyObj('event', ['stopPropagation']);
@@ -210,6 +227,26 @@ describe('SearchHeaderComponent', () => {
         applyButton.triggerEventHandler('click', fakeEvent);
         fixture.detectChanges();
         await fixture.whenStable();
+    });
+
+    it('should not emit clear event when currentFolderNodeId changes and no filter was applied', async () => {
+        const currentFolderNodeIdChange = new SimpleChange('current-node-id', 'next-node-id', true);
+        spyOn(component, 'isActive').and.returnValue(false);
+        spyOn(component.clear, 'emit');
+
+        component.ngOnChanges({ currentFolderNodeId: currentFolderNodeIdChange });
+        fixture.detectChanges();
+        expect(component.clear.emit).not.toHaveBeenCalled();
+    });
+
+    it('should emit clear event when currentFolderNodeId changes and filter was applied', async () => {
+        const currentFolderNodeIdChange = new SimpleChange('current-node-id', 'next-node-id', true);
+        spyOn(component.clear, 'emit');
+        spyOn(component, 'isActive').and.returnValue(true);
+
+        component.ngOnChanges({ currentFolderNodeId: currentFolderNodeIdChange });
+        fixture.detectChanges();
+        expect(component.clear.emit).toHaveBeenCalled();
     });
 
     describe('Accessibility', () => {

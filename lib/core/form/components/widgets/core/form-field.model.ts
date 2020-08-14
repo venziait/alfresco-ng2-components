@@ -48,6 +48,7 @@ export class FormFieldModel extends FormWidgetModel {
     rowspan: number = 1;
     colspan: number = 1;
     placeholder: string = null;
+    tooltip: string = null;
     minLength: number = 0;
     maxLength: number = 0;
     minValue: string;
@@ -169,6 +170,7 @@ export class FormFieldModel extends FormWidgetModel {
             this.dateDisplayFormat = json.dateDisplayFormat || this.getDefaultDateFormat(json);
             this._value = this.parseValue(json);
             this.validationSummary = new ErrorMessageModel();
+            this.tooltip = json.tooltip;
 
             if (json.placeholder && json.placeholder !== '' && json.placeholder !== 'null') {
                 this.placeholder = json.placeholder;
@@ -225,7 +227,7 @@ export class FormFieldModel extends FormWidgetModel {
     }
 
     private getFieldNameWithLabel(name: string): string {
-        return name += '_LABEL';
+        return name + '_LABEL';
     }
 
     private getProcessVariableValue(field: any, form: FormModel): any {
@@ -272,14 +274,19 @@ export class FormFieldModel extends FormWidgetModel {
          but saving back as object: { id: <id>, name: <name> }
          */
         if (json.type === FormFieldTypes.DROPDOWN) {
-            if (json.hasEmptyValue && json.options) {
+
+            if (json.options) {
                 const options = <FormFieldOption[]> json.options || [];
                 if (options.length > 0) {
-                    const emptyOption = json.options[0];
-                    if (value === '' || value === emptyOption.id || value === emptyOption.name) {
-                        value = emptyOption.id;
-                    } else if (value.id && value.name) {
-                        value = value.id;
+                    if (json.hasEmptyValue) {
+                        const emptyOption = json.options[0];
+                        if (value === '' || value === emptyOption.id || value === emptyOption.name) {
+                            value = emptyOption.id;
+                        }
+                    } else {
+                        if (value?.id && value?.name) {
+                            value = value.id;
+                        }
                     }
                 }
             }
@@ -318,7 +325,7 @@ export class FormFieldModel extends FormWidgetModel {
             }
         }
 
-        if (json.type === FormFieldTypes.BOOLEAN) {
+        if (this.isCheckboxField(json)) {
             value = json.value === 'true' || json.value === true ? true : false;
         }
 
@@ -443,6 +450,13 @@ export class FormFieldModel extends FormWidgetModel {
             json.params.field &&
             json.params.field.type === FormFieldTypes.DATETIME) ||
             json.type === FormFieldTypes.DATETIME;
+    }
+
+    private isCheckboxField(json: any): boolean {
+        return (json.params &&
+            json.params.field &&
+            json.params.field.type === FormFieldTypes.BOOLEAN) ||
+            json.type === FormFieldTypes.BOOLEAN;
     }
 
 }

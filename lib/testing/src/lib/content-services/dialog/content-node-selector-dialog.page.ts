@@ -15,11 +15,13 @@
  * limitations under the License.
  */
 
-import { by, element } from 'protractor';
+import { by, element, browser } from 'protractor';
+import * as remote from 'selenium-webdriver/remote';
 import { DocumentListPage } from '../pages/document-list.page';
 import { BrowserVisibility } from '../../core/utils/browser-visibility';
 import { BrowserActions } from '../../core/utils/browser-actions';
 import { DropdownPage } from '../../core/pages/material/dropdown.page';
+import { BreadcrumbDropdownPage } from '../pages/breadcrumb/breadcrumb-dropdown.page';
 
 export class ContentNodeSelectorDialogPage {
     dialog = element(by.css(`adf-content-node-selector`));
@@ -33,6 +35,7 @@ export class ContentNodeSelectorDialogPage {
     contentList = new DocumentListPage(this.dialog);
     dataTable = this.contentList.dataTablePage();
     siteListDropdown = new DropdownPage(this.dialog.element(by.css(`mat-select[data-automation-id='site-my-files-option']`)));
+    breadcrumbDropdownPage = new BreadcrumbDropdownPage();
 
     async checkDialogIsDisplayed(): Promise<void> {
         await BrowserVisibility.waitUntilElementIsVisible(this.dialog);
@@ -101,6 +104,7 @@ export class ContentNodeSelectorDialogPage {
 
     async clickContentNodeSelectorResult(name: string): Promise<void> {
         await this.dataTable.clickRowByContent(name);
+        await this.dataTable.checkRowByContentIsSelected(name);
     }
 
     async doubleClickContentNodeSelectorResult(name: string): Promise<void> {
@@ -118,6 +122,25 @@ export class ContentNodeSelectorDialogPage {
         await this.dataTable.waitTillContentLoaded();
         await this.dataTable.checkRowContentIsDisplayed(folderName);
         await this.dataTable.doubleClickRowByContent(folderName);
+
+        await this.dataTable.waitForTableBody();
+        await this.dataTable.waitTillContentLoaded();
+        await this.dataTable.checkRowContentIsDisplayed(fileName);
+
+        await this.clickContentNodeSelectorResult(fileName);
+        await this.checkCopyMoveButtonIsEnabled();
+        await this.clickMoveCopyButton();
+    }
+
+    async attachFileFromLocal(fileName: string, fileLocation: string): Promise<void> {
+        await this.checkDialogIsDisplayed();
+        await this.dataTable.waitForTableBody();
+        await this.breadcrumbDropdownPage.checkCurrentFolderIsDisplayed();
+
+        await browser.setFileDetector(new remote.FileDetector());
+        const uploadButton = element(by.css('adf-upload-button input'));
+        await BrowserVisibility.waitUntilElementIsPresent(uploadButton);
+        await uploadButton.sendKeys(fileLocation);
 
         await this.dataTable.waitForTableBody();
         await this.dataTable.waitTillContentLoaded();

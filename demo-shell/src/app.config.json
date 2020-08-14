@@ -567,7 +567,7 @@
           "ascending": true
         },
         {
-          "key": "createdByUser",
+          "key": "createdByUser.displayName",
           "label": "Author",
           "type": "FIELD",
           "field": "cm:creator",
@@ -1012,7 +1012,8 @@
     },
     "multi-value-pipe-separator": ", ",
     "multi-value-chips": true,
-    "copy-to-clipboard-action": true
+    "copy-to-clipboard-action": true,
+    "selectFilterLimit": 5
   },
   "sideNav": {
     "expandedSidenav": true,

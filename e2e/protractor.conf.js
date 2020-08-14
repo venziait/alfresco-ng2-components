@@ -189,6 +189,10 @@ exports.config = {
     },
 
     async onPrepare() {
+        if (process.env.CI) {
+            smartRunner.apply({repoHash: process.env.GIT_HASH || ''});
+        }
+
         retry.onPrepare();
 
         jasmine.DEFAULT_TIMEOUT_INTERVAL = TIMEOUT;

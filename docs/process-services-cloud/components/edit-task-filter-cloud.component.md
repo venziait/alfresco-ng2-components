@@ -49,6 +49,7 @@ Edits task filter details.
 | id | `string` |  | (required) ID of the task filter. |
 | role | `string` | "" | user role. |
 | showFilterActions | `boolean` | true | Toggles the filter actions. |
+| showTaskFilterName | `boolean` | true | Toggles display of task filter name |
 | showTitle | `boolean` | true | Toggles the title. |
 | sortProperties | `string[]` |  | List of sort properties to display. |
 
@@ -82,14 +83,14 @@ given below:
 | ---- | ----------- |
 | **_appName_** | Name of the app |
 | **_status_** | Execution state of the task. |
-| **_assignee_** | [User](../../../lib/core/pipes/user-initial.pipe.ts) the task is assigned to |
+| **_assignee_** | [`User`](../../../lib/core/pipes/user-initial.pipe.ts) the task is assigned to |
 | **_taskName_** | Name of the task |
 | **_taskId_** | ID of the task |
 | **_parentTaskId_** | ID of the task's parent task |
 | **_priority_** | Task priority |
 | **_createdDate_** | Date the task was created |
 | **_standalone_** | Standalone status of the task |
-| **_owner_** | [User](../../../lib/core/pipes/user-initial.pipe.ts) ID of the task's owner |
+| **_owner_** | [`User`](../../../lib/core/pipes/user-initial.pipe.ts) ID of the task's owner |
 | **_processDefinitionId_** | Process definition ID |
 | **_processInstanceId_** | Process instance ID |
 | **_lastModified_** | Date the task was last modified. If lastModified defined the component will show the range **_lastModifiedFrom_**, **_lastModifiedTo_** |

@@ -27,8 +27,7 @@ import {
     FormFieldTypes,
     FormFieldMetadata,
     FormService,
-    DownloadService,
-    NotificationService
+    DownloadService
 } from '@alfresco/adf-core';
 import { ProcessServiceCloudTestingModule } from '../../../../testing/process-service-cloud.testing.module';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
@@ -45,7 +44,6 @@ describe('AttachFileCloudWidgetComponent', () => {
     let element: HTMLInputElement;
     let contentCloudNodeSelectorService: ContentCloudNodeSelectorService;
     let processCloudContentService: ProcessCloudContentService;
-    let notificationService: NotificationService;
     let formService: FormService;
     let downloadService: DownloadService;
 
@@ -79,6 +77,12 @@ describe('AttachFileCloudWidgetComponent', () => {
         fileSource: {
             name: 'mock-alf-content',
             serviceId: 'alfresco-content'
+        },
+        menuOptions: {
+            show: true,
+            download: true,
+            retrieveMetadata: true,
+            remove: true
         }
     };
 
@@ -90,11 +94,27 @@ describe('AttachFileCloudWidgetComponent', () => {
         }
     };
 
-    const allSourceParamsWithWrongPath = {
+    const allSourceWithRootParams = {
         fileSource: {
             name: 'all file sources',
             serviceId: 'all-file-sources',
-            destinationFolderPath: 'mock-folder'
+            destinationFolderPath: '-root-'
+        }
+    };
+
+    const allSourceWithWrongAliasParams = {
+        fileSource: {
+            name: 'all file sources',
+            serviceId: 'all-file-sources',
+            destinationFolderPath: '-wrongAlias-'
+        }
+    };
+
+    const allSourceWithNoAliasParams = {
+        fileSource: {
+            name: 'all file sources',
+            serviceId: 'all-file-sources',
+            destinationFolderPath: '/noalias/createdFolder'
         }
     };
 
@@ -103,12 +123,36 @@ describe('AttachFileCloudWidgetComponent', () => {
         name: 'fake-name',
         content: {
             mimeType: 'application/pdf'
+        },
+        properties: {
+            'pfx:property_one': 'testValue',
+            'pfx:property_two': true
         }
     };
 
     const mockNodeId = new Promise(function (resolve) {
         resolve('mock-node-id');
     });
+
+    const fakeLocalPngAnswer = {
+        id: 1155,
+        nodeId: 1155,
+        name: 'a_png_file.png',
+        created: '2017-07-25T17:17:37.099Z',
+        createdBy: {
+            id: 1001,
+            firstName: 'Admin',
+            lastName: 'admin',
+            email: 'admin'
+        },
+        relatedContent: false,
+        contentAvailable: true,
+        link: false,
+        mimeType: 'image/png',
+        simpleType: 'image',
+        previewStatus: 'queued',
+        thumbnailStatus: 'queued'
+    };
 
     setupTestBed({
         imports: [
@@ -130,7 +174,6 @@ describe('AttachFileCloudWidgetComponent', () => {
             ContentCloudNodeSelectorService
         );
         formService = TestBed.inject(FormService);
-        notificationService = TestBed.inject(NotificationService);
     }));
 
     afterEach(() => {
@@ -222,66 +265,6 @@ describe('AttachFileCloudWidgetComponent', () => {
         expect(fileIcon).not.toBeNull();
     });
 
-    it('should be able to fetch nodeId if destinationFolderPtah defined ', async() => {
-        const fetchNodeIdFromRelativePathSpy = spyOn(contentCloudNodeSelectorService, 'fetchNodeIdFromRelativePath').and.returnValue(mockNodeId);
-        spyOn(
-            contentCloudNodeSelectorService,
-            'openUploadFileDialog'
-        ).and.returnValue(of([fakeMinimalNode]));
-        widget.field = new FormFieldModel(new FormModel(), {
-            type: FormFieldTypes.UPLOAD,
-            value: []
-        });
-        widget.field.id = 'attach-file-alfresco';
-        widget.field.params = <FormFieldMetadata> allSourceParams;
-        fixture.detectChanges();
-        await fixture.whenStable();
-        const attachButton: HTMLButtonElement = element.querySelector('#attach-file-alfresco');
-
-        expect(attachButton).not.toBeNull();
-
-        attachButton.click();
-        await fixture.whenStable();
-        fixture.detectChanges();
-
-        const alias = '-root-';
-        const opt = { relativePath: '/myfiles' };
-        expect(fetchNodeIdFromRelativePathSpy).toHaveBeenCalledWith(alias, opt);
-        expect(widget.field.params.fileSource.destinationFolderPath).toBe('-root-/myfiles');
-        expect(widget.rootNodeId).toEqual('mock-node-id');
-    });
-
-    it('should be able to show error notification if destinationFolderPtah wrong/undefined', async() => {
-        const fetchNodeIdFromRelativePathSpy = spyOn(contentCloudNodeSelectorService, 'fetchNodeIdFromRelativePath').and.returnValue(mockNodeId);
-        spyOn(
-            contentCloudNodeSelectorService,
-            'openUploadFileDialog'
-        ).and.returnValue(of([fakeMinimalNode]));
-        widget.field = new FormFieldModel(new FormModel(), {
-            type: FormFieldTypes.UPLOAD,
-            value: []
-        });
-        const showErrorSpy = spyOn(notificationService, 'showError').and.callThrough();
-        widget.field = new FormFieldModel(new FormModel(), {
-            type: FormFieldTypes.UPLOAD,
-            value: []
-        });
-        widget.field.id = 'attach-file-alfresco';
-        widget.field.params = <FormFieldMetadata> allSourceParamsWithWrongPath;
-        fixture.detectChanges();
-        await fixture.whenStable();
-        const attachButton: HTMLButtonElement = element.querySelector('#attach-file-alfresco');
-
-        expect(attachButton).not.toBeNull();
-
-        attachButton.click();
-        await fixture.whenStable();
-        fixture.detectChanges();
-
-        expect(fetchNodeIdFromRelativePathSpy).not.toHaveBeenCalled();
-        expect(showErrorSpy).toHaveBeenCalled();
-    });
-
     it('should display file list when field has value', async(() => {
         widget.field = new FormFieldModel(new FormModel(), {
             type: FormFieldTypes.UPLOAD,
@@ -306,6 +289,150 @@ describe('AttachFileCloudWidgetComponent', () => {
         fixture.detectChanges();
         fixture.whenStable().then(() => {
             expect(element.querySelector('label').innerText).toEqual('Label');
+        });
+    });
+
+    describe('destinationFolderPath', () => {
+        let openUploadFileDialogSpy: jasmine.Spy;
+
+        beforeEach(async(() => {
+            openUploadFileDialogSpy = spyOn(contentCloudNodeSelectorService, 'openUploadFileDialog').and.returnValue(of([fakeMinimalNode]));
+        }));
+
+        it('should be able to fetch nodeId if destinationFolderPath is defined', async() => {
+            const fetchNodeIdFromRelativePathSpy = spyOn(contentCloudNodeSelectorService, 'fetchNodeIdFromRelativePath').and.returnValue(mockNodeId);
+            widget.field = new FormFieldModel(new FormModel(), {
+                type: FormFieldTypes.UPLOAD,
+                value: []
+            });
+            widget.field.id = 'attach-file-alfresco';
+            widget.field.params = <FormFieldMetadata> allSourceParams;
+            fixture.detectChanges();
+            await fixture.whenStable();
+            const attachButton: HTMLButtonElement = element.querySelector('#attach-file-alfresco');
+
+            expect(attachButton).not.toBeNull();
+
+            attachButton.click();
+            await fixture.whenStable();
+            fixture.detectChanges();
+
+            const alias = '-root-';
+            const opt = { relativePath: '/myfiles' };
+            expect(fetchNodeIdFromRelativePathSpy).toHaveBeenCalledWith(alias, opt);
+            expect(widget.field.params.fileSource.destinationFolderPath).toBe('-root-/myfiles');
+            expect(widget.rootNodeId).toEqual('mock-node-id');
+        });
+
+        it('Should be able to set given alias as rootNodeId if the nodeId of the alias is not fetched from the api', async() => {
+            widget.field = new FormFieldModel(new FormModel(), {
+                type: FormFieldTypes.UPLOAD,
+                value: []
+            });
+            widget.field.id = 'attach-file-alfresco';
+            widget.field.params = <FormFieldMetadata> allSourceWithRootParams;
+            fixture.detectChanges();
+            await fixture.whenStable();
+            const attachButton: HTMLButtonElement = element.querySelector('#attach-file-alfresco');
+
+            expect(attachButton).not.toBeNull();
+
+            attachButton.click();
+            await fixture.whenStable();
+            fixture.detectChanges();
+
+            expect(widget.rootNodeId).toEqual('-root-');
+            expect(openUploadFileDialogSpy).toHaveBeenCalledWith('-root-', 'single', true);
+        });
+
+        it('Should be able to set default alias as rootNodeId if destinationFolderPath contains wrong alias', async() => {
+            widget.field = new FormFieldModel(new FormModel(), {
+                type: FormFieldTypes.UPLOAD,
+                value: []
+            });
+            widget.field.id = 'attach-file-alfresco';
+            widget.field.params = <FormFieldMetadata> allSourceWithWrongAliasParams;
+            widget.field.params.multiple = true;
+            fixture.detectChanges();
+            await fixture.whenStable();
+            const attachButton: HTMLButtonElement = element.querySelector('#attach-file-alfresco');
+
+            expect(attachButton).not.toBeNull();
+
+            attachButton.click();
+            await fixture.whenStable();
+            fixture.detectChanges();
+
+            expect(widget.rootNodeId).toEqual('-root-');
+            expect(openUploadFileDialogSpy).toHaveBeenCalledWith('-root-', 'multiple', true);
+        });
+
+        it('Should be able to set default alias as rootNodeId if destinationFolderPath does not have alias', async() => {
+            widget.field = new FormFieldModel(new FormModel(), {
+                type: FormFieldTypes.UPLOAD,
+                value: []
+            });
+            widget.field.id = 'attach-file-alfresco';
+            widget.field.params = <FormFieldMetadata> allSourceWithNoAliasParams;
+            widget.field.params.multiple = true;
+            fixture.detectChanges();
+            await fixture.whenStable();
+            const attachButton: HTMLButtonElement = element.querySelector('#attach-file-alfresco');
+
+            expect(attachButton).not.toBeNull();
+
+            attachButton.click();
+            await fixture.whenStable();
+            fixture.detectChanges();
+
+            expect(widget.rootNodeId).toEqual('-root-');
+            expect(openUploadFileDialogSpy).toHaveBeenCalledWith('-root-', 'multiple', true);
+        });
+
+        describe('FilesSource', () => {
+
+            it('should be able to set myFiles folderId as rootNodeId if fileSource set only to content', async() => {
+                widget.field = new FormFieldModel(new FormModel(), {
+                    type: FormFieldTypes.UPLOAD,
+                    value: []
+                });
+                widget.field.id = 'attach-file-alfresco';
+                widget.field.params = <FormFieldMetadata> contentSourceParam;
+                fixture.detectChanges();
+                await fixture.whenStable();
+                const attachButton: HTMLButtonElement = element.querySelector('#attach-file-alfresco');
+
+                expect(attachButton).not.toBeNull();
+
+                attachButton.click();
+                await fixture.whenStable();
+                fixture.detectChanges();
+
+                expect(widget.rootNodeId).toEqual('-my-');
+                expect(openUploadFileDialogSpy).toHaveBeenCalledWith('-my-', 'single', false);
+            });
+
+            it('should be able to set root folderId as rootNodeId if fileSource set to content and local', async() => {
+                widget.field = new FormFieldModel(new FormModel(), {
+                    type: FormFieldTypes.UPLOAD,
+                    value: []
+                });
+                widget.field.id = 'attach-file-alfresco';
+                widget.field.params = <FormFieldMetadata> allSourceWithWrongAliasParams;
+                widget.field.params.multiple = false;
+                fixture.detectChanges();
+                await fixture.whenStable();
+                const attachButton: HTMLButtonElement = element.querySelector('#attach-file-alfresco');
+
+                expect(attachButton).not.toBeNull();
+
+                attachButton.click();
+                await fixture.whenStable();
+                fixture.detectChanges();
+
+                expect(widget.rootNodeId).toEqual('-root-');
+                expect(openUploadFileDialogSpy).toHaveBeenCalledWith('-root-', 'single', true);
+            });
         });
     });
 
@@ -454,6 +581,75 @@ describe('AttachFileCloudWidgetComponent', () => {
                 ).nativeElement
             );
             showOption.click();
+        });
+
+        it('should request form to be updated with metadata when retrieve is clicked', (done) => {
+            const updateFormSpy = spyOn(formService.updateFormValuesRequested, 'next');
+            const expectedValues = { pfx_property_one: 'testValue', pfx_property_two: true};
+
+            const menuButton: HTMLButtonElement = <HTMLButtonElement> (
+                fixture.debugElement.query(By.css('#file-fake-option-menu'))
+                    .nativeElement
+            );
+
+            menuButton.click();
+            fixture.detectChanges();
+
+            const retrieveMetadataOption: HTMLButtonElement = <HTMLButtonElement> (
+                fixture.debugElement.query(By.css('#file-fake-retrieve-file-metadata'))
+                    .nativeElement
+            );
+
+            retrieveMetadataOption.click();
+
+            fixture.detectChanges();
+            fixture.whenStable().then(() => {
+                expect(updateFormSpy).toHaveBeenCalledWith(expectedValues);
+                done();
+            });
+        });
+
+        it('should display the default menu options if no options are provided', () => {
+            widget.field.params = <FormFieldMetadata> onlyLocalParams;
+            fixture.detectChanges();
+            fixture.whenStable().then(() => {
+                const inputDebugElement = fixture.debugElement.query(
+                    By.css('#attach-file-attach')
+                );
+                inputDebugElement.triggerEventHandler('change', {
+                    target: { files: [fakeLocalPngAnswer] }
+                });
+                fixture.detectChanges();
+                const menuButton: HTMLButtonElement = <HTMLButtonElement> (
+                    fixture.debugElement.query(
+                        By.css('#file-1155-option-menu')
+                    ).nativeElement
+                );
+                menuButton.click();
+                fixture.detectChanges();
+                const showOption: HTMLButtonElement = <HTMLButtonElement> (
+                    fixture.debugElement.query(
+                        By.css('#file-1155-show-file')
+                    ).nativeElement
+                );
+                const downloadOption: HTMLButtonElement = <HTMLButtonElement> (
+                    fixture.debugElement.query(By.css('#file-1155-download-file'))
+                        .nativeElement
+                );
+                const retrieveMetadataOption: HTMLButtonElement = <HTMLButtonElement> (
+                    fixture.debugElement.query(By.css('#file-1155-retrieve-file-metadata'))
+                        .nativeElement
+                );
+                const removeOption: HTMLButtonElement = <HTMLButtonElement> (
+                    fixture.debugElement.query(By.css('#file-1155-remove'))
+                        .nativeElement
+                );
+
+                expect(showOption).not.toBeNull();
+                expect(downloadOption).not.toBeNull();
+                expect(retrieveMetadataOption).toBeNull();
+                expect(removeOption).not.toBeNull();
+            });
         });
     });
 });

@@ -20,7 +20,7 @@ import { AlfrescoApiService } from '@alfresco/adf-core';
 import { MatDialog } from '@angular/material/dialog';
 import { ContentNodeSelectorComponent, ContentNodeSelectorComponentData } from '@alfresco/adf-content-services';
 import { Node } from '@alfresco/js-api';
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, throwError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -32,7 +32,7 @@ export class ContentCloudNodeSelectorService {
     private dialog: MatDialog) {
   }
 
-  openUploadFileDialog(currentFolderId?: string, selectionMode?: string, showLocalUploadButton?: boolean): Observable<Node[]> {
+  openUploadFileDialog(currentFolderId?: string, selectionMode?: string, isAllFileSources?: boolean): Observable<Node[]> {
     const select = new Subject<Node[]>();
     select.subscribe({
       complete: this.close.bind(this)
@@ -41,24 +41,24 @@ export class ContentCloudNodeSelectorService {
       title: 'Select a file',
       actionName: 'Attach',
       currentFolderId,
-      restrictRootToCurrentFolderId: true,
+      restrictRootToCurrentFolderId: isAllFileSources,
       select,
       selectionMode,
       isSelectionValid: (entry: Node) => entry.isFile,
       showFilesInResult: true,
       showDropdownSiteList: false,
-      showLocalUploadButton
+      showLocalUploadButton: isAllFileSources
   };
     this.openContentNodeDialog(data, 'adf-content-node-selector-dialog', '630px');
     return select;
   }
 
     async fetchNodeIdFromRelativePath(alias: string, opts: { relativePath: string }): Promise<string> {
-        let nodeId = '';
-        await this.apiService.getInstance().node.getNode(alias, opts).then(node => {
-            nodeId = node.entry.id;
-        });
-        return nodeId;
+        const nodeEntry: any = await this.apiService.getInstance().node
+            .getNode(alias, opts)
+            .catch((err) => this.handleError(err));
+
+        return nodeEntry?.entry?.id;
     }
 
   private openContentNodeDialog(data: ContentNodeSelectorComponentData, currentPanelClass: string, chosenWidth: string) {
@@ -67,5 +67,9 @@ export class ContentCloudNodeSelectorService {
 
   close() {
     this.dialog.closeAll();
+  }
+
+  private handleError(error: any): Observable<any> {
+    return throwError(error || 'Server error');
   }
 }

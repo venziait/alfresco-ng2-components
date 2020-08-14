@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { Component, Input, OnChanges, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, OnDestroy, EventEmitter, ViewEncapsulation } from '@angular/core';
 import { CardViewItem, CardViewTextItemModel, TranslationService, AppConfigService, CardViewDateItemModel, CardViewBaseItemModel } from '@alfresco/adf-core';
 import { ProcessInstanceCloud } from '../../start-process/models/process-instance-cloud.model';
 import { ProcessCloudService } from '../../services/process-cloud.service';
@@ -25,10 +25,10 @@ import { Subject } from 'rxjs';
 @Component({
     selector: 'adf-cloud-process-header',
     templateUrl: './process-header-cloud.component.html',
-    styleUrls: ['./process-header-cloud.component.scss']
+    encapsulation: ViewEncapsulation.None,
+    host: { class: 'adf-cloud-process-header' }
 })
-
-export class ProcessHeaderCloudComponent implements OnChanges, OnInit {
+export class ProcessHeaderCloudComponent implements OnChanges, OnInit, OnDestroy {
 
     /** (Required) The name of the application. */
     @Input()
@@ -43,23 +43,24 @@ export class ProcessHeaderCloudComponent implements OnChanges, OnInit {
     dateFormat: string;
     dateLocale: string;
 
+    /** Gets emitted each time a new process instance details are loaded. */
+    loaded = new EventEmitter<ProcessInstanceCloud>();
+
     private onDestroy$ = new Subject<boolean>();
 
     constructor(
         private processCloudService: ProcessCloudService,
         private translationService: TranslationService,
         private appConfig: AppConfigService) {
-            this.dateFormat = this.appConfig.get('dateValues.defaultDateFormat');
-            this.dateLocale = this.appConfig.get('dateValues.defaultDateLocale');
     }
 
     ngOnInit() {
+        this.dateFormat = this.appConfig.get('dateValues.defaultDateFormat');
+        this.dateLocale = this.appConfig.get('dateValues.defaultDateLocale');
+
         this.processCloudService.dataChangesDetected
             .pipe(takeUntil(this.onDestroy$))
-            .subscribe((processDetails) => {
-                this.processInstanceDetails = processDetails;
-                this.refreshData();
-            });
+            .subscribe((processDetails) => this.onLoaded(processDetails));
     }
 
     ngOnChanges() {
@@ -69,11 +70,16 @@ export class ProcessHeaderCloudComponent implements OnChanges, OnInit {
     }
 
     private loadProcessInstanceDetails(appName: string, processInstanceId: string) {
-        this.processCloudService.getProcessInstanceById(appName, processInstanceId).subscribe(
-            (processInstanceDetails) => {
-                this.processInstanceDetails = processInstanceDetails;
-                this.refreshData();
-            });
+        this.processCloudService
+            .getProcessInstanceById(appName, processInstanceId)
+            .subscribe((result) => this.onLoaded(result));
+    }
+
+    private onLoaded(processInstanceDetails: ProcessInstanceCloud) {
+        this.processInstanceDetails = processInstanceDetails;
+        this.refreshData();
+
+        this.loaded.emit(processInstanceDetails);
     }
 
     /**
@@ -82,7 +88,7 @@ export class ProcessHeaderCloudComponent implements OnChanges, OnInit {
     refreshData() {
         if (this.processInstanceDetails) {
             const defaultProperties = this.initDefaultProperties();
-            const filteredProperties: string[] = this.appConfig.get('adf-cloud-process-header.presets.properties');
+            const filteredProperties = this.appConfig.get<string[]>('adf-cloud-process-header.presets.properties');
             this.properties = defaultProperties.filter((cardItem) => this.isValidSelection(filteredProperties, cardItem));
         }
     }

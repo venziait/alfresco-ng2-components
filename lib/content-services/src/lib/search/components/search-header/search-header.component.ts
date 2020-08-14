@@ -52,7 +52,8 @@ export class SearchHeaderComponent implements OnInit, OnChanges, OnDestroy {
     @Input()
     col: DataColumn;
 
-    @Input()
+    /** (optional) Initial filter value to sort . */
+     @Input()
     value: any;
 
     /** The id of the current folder of the document list. */
@@ -66,6 +67,10 @@ export class SearchHeaderComponent implements OnInit, OnChanges, OnDestroy {
     /** The offset of the start of the page within the results list. */
     @Input()
     skipCount: number;
+
+    /** The sorting to apply to the the filter. */
+    @Input()
+    sorting: string = null;
 
     /** Emitted when the result of the filter is received from the API. */
     @Output()
@@ -108,19 +113,12 @@ export class SearchHeaderComponent implements OnInit, OnChanges, OnDestroy {
             .subscribe((newNodePaging: NodePaging) => {
                 this.update.emit(newNodePaging);
             });
-
-        if (this.searchHeaderQueryBuilder.isCustomSourceNode(this.currentFolderNodeId)) {
-            this.searchHeaderQueryBuilder.getNodeIdForCustomSource(this.currentFolderNodeId).subscribe((node: MinimalNode) => {
-                this.initSearchHeader(node.id);
-            });
-        } else {
-            this.initSearchHeader(this.currentFolderNodeId);
-        }
     }
 
     ngOnChanges(changes: SimpleChanges) {
         if (changes['currentFolderNodeId'] && changes['currentFolderNodeId'].currentValue) {
             this.clearHeader();
+            this.configureSearchParent(changes['currentFolderNodeId'].currentValue);
         }
 
         if (changes['maxItems'] || changes['skipCount']) {
@@ -136,6 +134,14 @@ export class SearchHeaderComponent implements OnInit, OnChanges, OnDestroy {
 
             this.searchHeaderQueryBuilder.setupCurrentPagination(actualMaxItems, actualSkipCount);
         }
+
+        if (changes['sorting'] && changes['sorting'].currentValue) {
+            const [key, value] = changes['sorting'].currentValue.split('-');
+            if (key === this.col.key) {
+                this.searchHeaderQueryBuilder.setSorting(key, value);
+            }
+        }
+
     }
 
     ngOnDestroy() {
@@ -166,7 +172,7 @@ export class SearchHeaderComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     clearHeader() {
-        if (this.widgetContainer) {
+        if (this.widgetContainer && this.isActive()) {
             this.widgetContainer.resetInnerWidget();
             this.searchHeaderQueryBuilder.removeActiveFilter(this.category.columnKey);
             this.selection.emit(this.searchHeaderQueryBuilder.getActiveFilters());
@@ -185,6 +191,16 @@ export class SearchHeaderComponent implements OnInit, OnChanges, OnDestroy {
 
     isActive(): boolean {
         return this.widgetContainer && this.widgetContainer.componentRef && this.widgetContainer.componentRef.instance.isActive;
+    }
+
+    private configureSearchParent(currentFolderNodeId: string) {
+        if (this.searchHeaderQueryBuilder.isCustomSourceNode(currentFolderNodeId)) {
+            this.searchHeaderQueryBuilder.getNodeIdForCustomSource(currentFolderNodeId).subscribe((node: MinimalNode) => {
+                this.initSearchHeader(node.id);
+            });
+        } else {
+            this.initSearchHeader(currentFolderNodeId);
+        }
     }
 
     private initSearchHeader(currentFolderId: string) {
