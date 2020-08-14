@@ -47,23 +47,14 @@ export class NodeDownloadDirective extends AbstractDownloadDirective {
             super();
     }
 
-    downloadFile(node: NodeEntry) {
-        if (node && node.entry) {
-            const contentApi = this.apiService.getInstance().content;
-            // nodeId for Shared node
-            const id = (<any> node.entry).nodeId || node.entry.id;
+    downloadVersion(nodeId: string, versionId: string, fileName: string): void {
+        const url = this.apiService.getInstance().content.getVersionContentUrl(nodeId, versionId, true);
+        this.downloadService.downloadUrl(url, fileName);
+    }
 
-            let url, fileName;
-            if (this.version) {
-                url = contentApi.getVersionContentUrl(id, this.version.entry.id, true);
-                fileName = this.version.entry.name;
-            } else {
-                url = contentApi.getContentUrl(id, true);
-                fileName = node.entry.name;
-            }
-
-            this.downloadService.downloadUrl(url, fileName);
-        }
+    downloadContent(nodeId, fileName: string): void {
+        const url = this.apiService.getInstance().content.getContentUrl(nodeId, true);
+        this.downloadService.downloadUrl(url, fileName);
     }
 
     downloadZip(selection: Array<NodeEntry>) {

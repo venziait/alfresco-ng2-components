@@ -84,6 +84,20 @@ export abstract class AbstractDownloadDirective {
         return selection || (selection instanceof Array && selection.length > 0);
     }
 
-    abstract downloadFile(node: NodeEntry): void;
+    private downloadFile(node: NodeEntry): void {
+        if (node && node.entry) {
+
+            // nodeId for Shared node
+            const id = (<any> node.entry).nodeId || node.entry.id;
+
+            if (this.version) {
+                this.downloadVersion(id, this.version.entry.id, node.entry.name);
+            } else {
+                this.downloadContent(id, node.entry.name);
+            }
+        }
+    }
+    abstract downloadVersion(nodeId: string, versionId: string, fileName: string): void;
+    abstract downloadContent(nodeId: string, fileName: string): void;
     abstract downloadZip(selection: Array<NodeEntry>): void;
 }

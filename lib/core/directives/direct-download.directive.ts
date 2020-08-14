@@ -41,32 +41,16 @@ export class DirectDownloadDirective extends AbstractDownloadDirective {
             super();
     }
 
-    downloadFile(node: NodeEntry) {
-        if (node && node.entry) {
-
-            // nodeId for Shared node
-            const id = (<any> node.entry).nodeId || node.entry.id;
-
-            if (this.version) {
-                this.downloadVersionDirect(id, this.version.entry.id, node.entry.name);
-            } else {
-                this.downloadDirectAccess(id, node.entry.name);
-            }
-        }
-    }
-
-    private downloadVersionDirect(nodeId: string, versionId: string, fileName: string, opts?: any) {
-        const nodesApi = new NodesApi(this.apiService.getInstance());
-        nodesApi.requestContentUrl_2(nodeId, versionId, opts).then(
+    downloadVersion(nodeId: string, versionId: string, fileName: string) {
+        new NodesApi(this.apiService.getInstance()).requestContentUrl_2(nodeId, versionId).then(
             directAccessUrlEntry => {
                 this.downloadService.downloadUrl(directAccessUrlEntry.entry.contentUrl, fileName);
             }
         );
     }
 
-    private downloadDirectAccess(nodeId: string, fileName: string, opts?: any) {
-        const nodesApi = new NodesApi(this.apiService.getInstance());
-        nodesApi.requestContentUrl(nodeId, opts).then(
+    downloadContent(nodeId: string, fileName: string) {
+        new NodesApi(this.apiService.getInstance()).requestContentUrl(nodeId).then(
             directAccessUrlEntry => {
                 this.downloadService.downloadUrl(directAccessUrlEntry.entry.contentUrl, fileName);
             }

@@ -33,7 +33,7 @@ export class VersionManagePage {
     commentText = element(by.id('adf-new-version-text-area'));
     readOnlySwitch = element(by.id('adf-version-manager-switch-readonly'));
     downloadSwitch = element(by.id('adf-version-manager-switch-download'));
-    directDownloadSwith = element(by.id('adf-version-manager-switch-direct-download'));
+    directDownloadSwitch = element(by.id('adf-version-manager-switch-direct-download'));
     commentsSwitch = element(by.id('adf-version-manager-switch-comments'));
 
     async checkUploadNewVersionsButtonIsDisplayed(): Promise<void> {
@@ -121,14 +121,14 @@ export class VersionManagePage {
      * disables download
      */
     async disableDirectDownload(): Promise<void> {
-        await this.togglePage.disableToggle(this.directDownloadSwith);
+        await this.togglePage.disableToggle(this.directDownloadSwitch);
     }
 
     /**
      * enables download
      */
     async enableDirectDownload(): Promise<void> {
-        await this.togglePage.enableToggle(this.directDownloadSwith);
+        await this.togglePage.enableToggle(this.directDownloadSwitch);
     }
 
     /**
