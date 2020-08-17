@@ -16,7 +16,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { AlfrescoApiService, AppConfigService, NodesApiService } from '@alfresco/adf-core';
+import { AlfrescoApiService, AppConfigService, DataSorting, NodesApiService } from '@alfresco/adf-core';
 import { SearchConfiguration } from './search-configuration.interface';
 import { BaseQueryBuilderService } from './base-query-builder.service';
 import { SearchCategory } from './search-category.interface';
@@ -56,7 +56,6 @@ export class SearchHeaderQueryBuilderService extends BaseQueryBuilderService {
             (this.paging &&
                 this.paging.maxItems !== maxItems || this.paging.skipCount !== skipCount)) {
             this.paging = { maxItems, skipCount };
-            this.execute();
         }
     }
 
@@ -78,20 +77,20 @@ export class SearchHeaderQueryBuilderService extends BaseQueryBuilderService {
         }
     }
 
-    setSorting(column: string, direction: string) {
-        const optionAscending = direction.toLocaleLowerCase() === 'asc' ? true : false;
-        const fieldValue = this.getSortingFieldFromColumnName(column);
-        const currentSort: SearchSortingDefinition = { key: column, label: 'current', type: 'FIELD', field: fieldValue, ascending: optionAscending};
-        this.sorting = [currentSort];
-        this.execute();
-    }
+    setSorting(sorting: DataSorting[]) {
+        let currentSort: SearchSortingDefinition[] = [];
 
-    private getSortingFieldFromColumnName(columnName: string) {
-        if (this.sortingOptions.length > 0) {
-            const sortOption: SearchSortingDefinition = this.sortingOptions.find((option: SearchSortingDefinition) => option.key === columnName);
-            return sortOption.field;
-        }
-        return '';
+        sorting?.forEach((currentSorting) => {
+            currentSort.push({
+                key: currentSorting.key,
+                label: 'current',
+                type: 'FIELD',
+                field: currentSorting.key,
+                ascending: currentSorting?.direction?.toLocaleLowerCase() === 'asc'
+            });
+        });
+
+        this.sorting = currentSort;
     }
 
     getCategoryForColumn(columnKey: string): SearchCategory {

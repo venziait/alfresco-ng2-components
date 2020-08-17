@@ -30,7 +30,7 @@ import {
     ElementRef
 } from '@angular/core';
 import { ConfigurableFocusTrapFactory, ConfigurableFocusTrap } from '@angular/cdk/a11y';
-import { DataColumn, TranslationService } from '@alfresco/adf-core';
+import { DataColumn, DataSorting, TranslationService } from '@alfresco/adf-core';
 import { SearchWidgetContainerComponent } from '../search-widget-container/search-widget-container.component';
 import { SearchHeaderQueryBuilderService } from '../../search-header-query-builder.service';
 import { NodePaging, MinimalNode } from '@alfresco/js-api';
@@ -41,19 +41,19 @@ import { takeUntil } from 'rxjs/operators';
 import { MatMenuTrigger } from '@angular/material/menu';
 
 @Component({
-    selector: 'adf-search-header',
+    selector: 'adf-search-filter-container',
     templateUrl: './search-header.component.html',
     styleUrls: ['./search-header.component.scss'],
     encapsulation: ViewEncapsulation.None
 })
-export class SearchHeaderComponent implements OnInit, OnChanges, OnDestroy {
+export class SearchFilterContainerComponent implements OnInit, OnChanges, OnDestroy {
 
     /** The column the filter will be applied on. */
     @Input()
     col: DataColumn;
 
     /** (optional) Initial filter value to sort . */
-     @Input()
+    @Input()
     value: any;
 
     /** The id of the current folder of the document list. */
@@ -70,7 +70,7 @@ export class SearchHeaderComponent implements OnInit, OnChanges, OnDestroy {
 
     /** The sorting to apply to the the filter. */
     @Input()
-    sorting: string = null;
+    sorting: DataSorting[] = null;
 
     /** Emitted when the result of the filter is received from the API. */
     @Output()
@@ -121,24 +121,17 @@ export class SearchHeaderComponent implements OnInit, OnChanges, OnDestroy {
             this.configureSearchParent(changes['currentFolderNodeId'].currentValue);
         }
 
-        if (changes['maxItems'] || changes['skipCount']) {
-            let actualMaxItems = this.maxItems;
-            let actualSkipCount = this.skipCount;
-
-            if (changes['maxItems'] && changes['maxItems'].currentValue) {
-                actualMaxItems = changes['maxItems'].currentValue;
-            }
-            if (changes['skipCount'] && changes['skipCount'].currentValue) {
-                actualSkipCount = changes['skipCount'].currentValue;
-            }
-
-            this.searchHeaderQueryBuilder.setupCurrentPagination(actualMaxItems, actualSkipCount);
+        if (changes['maxItems']?.currentValue || changes['skipCount']?.currentValue) {
+            this.searchHeaderQueryBuilder.setupCurrentPagination(this.maxItems, this.skipCount);
         }
 
-        if (changes['sorting'] && changes['sorting'].currentValue) {
-            const [key, value] = changes['sorting'].currentValue.split('-');
-            if (key === this.col.key) {
-                this.searchHeaderQueryBuilder.setSorting(key, value);
+        if (changes['sorting']?.currentValue) {
+            this.searchHeaderQueryBuilder.setSorting(this.sorting);
+            if (this.sorting) {
+                let key = this.sorting.length > 1 ? this.sorting[1]?.key : this.sorting[0]?.key;
+                if (key === this.col.key) {
+                    this.searchHeaderQueryBuilder.execute();
+                }
             }
         }
 

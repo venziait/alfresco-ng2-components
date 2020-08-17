@@ -23,13 +23,34 @@ import { Location } from '@angular/common';
 
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { MinimalNodeEntity, NodePaging, Pagination, MinimalNodeEntryEntity, SiteEntry, SearchEntry } from '@alfresco/js-api';
 import {
-    AlfrescoApiService, AuthenticationService, AppConfigService, AppConfigValues, ContentService, TranslationService, FolderCreatedEvent, LogService, NotificationService,
-    UploadService, DataRow, UserPreferencesService,
-    PaginationComponent, FormValues, DisplayMode, ShowHeaderMode, InfinitePaginationComponent, HighlightDirective,
-    SharedLinksApiService,
-    FormRenderingService
+    MinimalNodeEntity,
+    NodePaging,
+    Pagination,
+    MinimalNodeEntryEntity,
+    SiteEntry,
+    SearchEntry
+} from '@alfresco/js-api';
+import {
+    AlfrescoApiService,
+    AuthenticationService,
+    AppConfigService,
+    AppConfigValues,
+    ContentService,
+    TranslationService,
+    FolderCreatedEvent,
+    LogService,
+    NotificationService,
+    UploadService,
+    DataRow,
+    UserPreferencesService,
+    PaginationComponent,
+    FormValues,
+    DisplayMode,
+    ShowHeaderMode,
+    InfinitePaginationComponent,
+    HighlightDirective,
+    SharedLinksApiService
 } from '@alfresco/adf-core';
 
 import {
@@ -48,6 +69,7 @@ import { MetadataDialogAdapterComponent } from './metadata-dialog-adapter.compon
 import { Subject } from 'rxjs';
 import { PreviewService } from '../../services/preview.service';
 import { takeUntil } from 'rxjs/operators';
+import { DataSorting } from '../../../../../lib/dist/core/datatable';
 
 const DEFAULT_FOLDER_TO_SHOW = '-my-';
 
@@ -78,9 +100,9 @@ export class FilesComponent implements OnInit, OnChanges, OnDestroy {
     toolbarColor = 'default';
 
     selectionModes = [
-        {value: 'none', viewValue: 'None'},
-        {value: 'single', viewValue: 'Single'},
-        {value: 'multiple', viewValue: 'Multiple'}
+        { value: 'none', viewValue: 'None' },
+        { value: 'single', viewValue: 'Single' },
+        { value: 'multiple', viewValue: 'Multiple' }
     ];
 
     // The identifier of a node. You can also use one of these well-known aliases: -my- | -shared- | -root-
@@ -169,9 +191,6 @@ export class FilesComponent implements OnInit, OnChanges, OnDestroy {
     @Input()
     paramValues: Map<any, any> = null;
 
-    @Input()
-    filterSorting: string = null;
-
     @Output()
     documentListReady: EventEmitter<any> = new EventEmitter();
 
@@ -215,6 +234,7 @@ export class FilesComponent implements OnInit, OnChanges, OnDestroy {
     enableMediumTimeFormat = false;
     displayEmptyMetadata = false;
     hyperlinkNavigation = false;
+    dataSorting: DataSorting[] = null;
 
     constructor(private notificationService: NotificationService,
                 private uploadService: UploadService,
@@ -328,7 +348,7 @@ export class FilesComponent implements OnInit, OnChanges, OnDestroy {
 
     getCurrentDocumentListNode(): MinimalNodeEntity[] {
         if (this.documentList.folderNode) {
-            return [{entry: this.documentList.folderNode}];
+            return [{ entry: this.documentList.folderNode }];
         } else {
             return [];
         }
@@ -427,7 +447,7 @@ export class FilesComponent implements OnInit, OnChanges, OnDestroy {
 
         if (this.contentService.hasAllowableOperations(contentEntry, 'update')) {
             this.dialog.open(VersionManagerDialogAdapterComponent, {
-                data: {contentEntry: contentEntry, showComments: showComments, allowDownload: allowDownload},
+                data: { contentEntry: contentEntry, showComments: showComments, allowDownload: allowDownload },
                 panelClass: 'adf-version-manager-dialog',
                 width: '630px'
             });
@@ -667,6 +687,10 @@ export class FilesComponent implements OnInit, OnChanges, OnDestroy {
         });
 
         this.router.navigate([], { relativeTo: this.route, queryParams: objectFromMap });
+    }
+
+    onSortingChanged(sorting: DataSorting[]) {
+        this.dataSorting = sorting;
     }
 
 }

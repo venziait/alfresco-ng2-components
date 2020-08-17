@@ -547,7 +547,7 @@ export class DataTableComponent implements AfterContentInit, OnChanges, DoCheck,
             }
             this.sorting = [column.key, newDirection];
             this.data.setSorting(new DataSorting(column.key, newDirection));
-            this.emitSortingChangedEvent(column.key, column.sortingKey, newDirection);
+            this.emitSortingChangedEvent(column.sortingKey, newDirection);
         }
 
         this.keyManager.updateActiveItem(0);
@@ -771,14 +771,10 @@ export class DataTableComponent implements AfterContentInit, OnChanges, DoCheck,
         this.elementRef.nativeElement.dispatchEvent(domEvent);
     }
 
-    private emitSortingChangedEvent(key: string, sortingKey: string, direction: string) {
+    private emitSortingChangedEvent(sortingKey: string, direction: string) {
         const domEvent = new CustomEvent('sorting-changed', {
-            detail: {
-                key,
-                sortingKey,
-                direction
-            },
-            bubbles: true
+            detail: new DataSorting(sortingKey, direction),
+            bubbles: false
         });
         this.elementRef.nativeElement.dispatchEvent(domEvent);
     }
@@ -800,7 +796,7 @@ export class DataTableComponent implements AfterContentInit, OnChanges, DoCheck,
 
         if (this.display === 'gallery') {
             for (let i = 0; i < maxGalleryRows; i++) {
-               this.fakeRows.push('');
+                this.fakeRows.push('');
             }
         } else {
             this.fakeRows = [];
@@ -808,7 +804,7 @@ export class DataTableComponent implements AfterContentInit, OnChanges, DoCheck,
     }
 
     getNameColumnValue() {
-        return this.data.getColumns().find( (el: any) => {
+        return this.data.getColumns().find((el: any) => {
             return el.key.includes('name');
         });
     }
@@ -830,7 +826,7 @@ export class DataTableComponent implements AfterContentInit, OnChanges, DoCheck,
 
     getSortLiveAnnouncement(column: DataColumn): string {
         if (!this.isColumnSortActive(column)) {
-            return 'ADF-DATATABLE.ACCESSIBILITY.SORT_DEFAULT' ;
+            return 'ADF-DATATABLE.ACCESSIBILITY.SORT_DEFAULT';
         }
         return this.isColumnSorted(column, 'asc') ?
             'ADF-DATATABLE.ACCESSIBILITY.SORT_ASCENDING_BY' :

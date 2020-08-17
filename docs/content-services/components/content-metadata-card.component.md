@@ -25,6 +25,7 @@ Displays and edits metadata related to a node.
 -   [Multi value card properties](#multi-value-card-properties)
     -   [Use chips for multi value properties](#use-chips-for-multi-value-properties)
 -   [Copy to Clipboard on click](#copy-to-clipboard-on-click)
+-   [Search select options (ACS 7+)](#search-select-options-acs-7)
 
 ## Basic Usage
 
