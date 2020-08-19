@@ -4,7 +4,6 @@ import {
     ElementRef,
     EventEmitter,
     Input,
-    OnChanges,
     OnDestroy,
     Output,
     ViewChild,
@@ -23,7 +22,7 @@ const containerElementName = 'reactComponentContainer';
     `,
     encapsulation: ViewEncapsulation.None
 })
-export class ReactWrapperComponent implements OnChanges, OnDestroy, AfterViewInit {
+export class ReactWrapperComponent implements OnDestroy, AfterViewInit {
     @ViewChild(containerElementName, { static: false })
     containerRef: ElementRef;
 
@@ -34,10 +33,6 @@ export class ReactWrapperComponent implements OnChanges, OnDestroy, AfterViewIni
     constructor() {
         this.handleDivClicked = this.handleDivClicked.bind(this);
     }
-
-    // ngOnChanges(): void {
-    //     this.render();
-    // }
 
     ngAfterViewInit() {
         this.render();
