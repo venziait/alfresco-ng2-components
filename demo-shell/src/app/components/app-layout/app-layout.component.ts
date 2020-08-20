@@ -37,7 +37,8 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
         {
             href: '/extensions', icon: 'extension', title: 'Extensions', children: [
                 { href: '/extensions/document-list/presets', icon: 'extension', title: 'Document List' },
-                { href: '/extensions/react', icon: 'extension', title: 'React' }
+                { href: '/extensions/react', icon: 'extension', title: 'React' },
+                { href: '/extensions/web-components', icon: 'extension', title: 'Web Components' }
             ]
         },
         { href: '/files', icon: 'folder_open', title: 'APP_LAYOUT.CONTENT_SERVICES' },
