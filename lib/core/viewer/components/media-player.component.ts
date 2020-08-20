@@ -15,8 +15,9 @@
  * limitations under the License.
  */
 
-import { Component, Input, OnChanges, SimpleChanges, ViewEncapsulation } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, ViewEncapsulation, ViewChild, ElementRef } from '@angular/core';
 import { ContentService } from '../../services/content.service';
+import { WebVTTValidatorService } from '../services/webvtt-validator.service';
 
 @Component({
     selector: 'adf-media-player',
@@ -39,7 +40,13 @@ export class MediaPlayerComponent implements OnChanges {
     @Input()
     nameFile: string;
 
-    constructor(private contentService: ContentService ) {}
+    @Input()
+    webVTT: string;
+
+    @ViewChild('videoPlayer')
+    videoPlayer: ElementRef;
+
+    constructor(private contentService: ContentService, private webVTTValidatorService: WebVTTValidatorService) { }
 
     ngOnChanges(changes: SimpleChanges) {
         const blobFile = changes['blobFile'];
@@ -50,6 +57,25 @@ export class MediaPlayerComponent implements OnChanges {
 
         if (!this.urlFile && !this.blobFile) {
             throw new Error('Attribute urlFile or blobFile is required');
+        }
+
+        if (this.webVTT) {
+            const track: TextTrack = this.videoPlayer.nativeElement.addTextTrack('caption', 'Captions');
+            if (this.addCuesFromWebVTT(track, this.webVTT)) {
+                track.mode = 'showing';
+            }
+        }
+    }
+
+    addCuesFromWebVTT(track: TextTrack, input: string): boolean {
+        try {
+            const inputValidationResult = this.webVTTValidatorService.parse(input);
+            if (inputValidationResult.errors.length === 0) {
+                inputValidationResult.cues.forEach(cue => track.addCue(new VTTCue(cue.start, cue.end, cue.text)));
+            }
+            return inputValidationResult.errors.length === 0;
+        } catch (e) {
+            return false;
         }
     }
 }

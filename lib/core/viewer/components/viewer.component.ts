@@ -195,11 +195,11 @@ export class ViewerComponent implements OnChanges, OnInit, OnDestroy {
 
     /** Emitted when user clicks 'Navigate Before' ("<") button. */
     @Output()
-    navigateBefore = new EventEmitter<MouseEvent|KeyboardEvent>();
+    navigateBefore = new EventEmitter<MouseEvent | KeyboardEvent>();
 
     /** Emitted when user clicks 'Navigate Next' (">") button. */
     @Output()
-    navigateNext = new EventEmitter<MouseEvent|KeyboardEvent>();
+    navigateNext = new EventEmitter<MouseEvent | KeyboardEvent>();
 
     /** Emitted when the shared link used is not valid. */
     @Output()
@@ -221,6 +221,7 @@ export class ViewerComponent implements OnChanges, OnInit, OnDestroy {
     sidebarLeftTemplateContext: { node: Node } = { node: null };
     fileTitle: string;
     viewerExtensions: Array<ViewerExtensionRef> = [];
+    webVTT: string;
 
     private cacheBusterNumber;
 
@@ -412,6 +413,13 @@ export class ViewerComponent implements OnChanges, OnInit, OnDestroy {
             }
         }
 
+        if (this.viewerType === 'media') {
+            // Get captions from node properties if present
+            if (nodeData.properties['acc:webvtt']) {
+                this.webVTT = nodeData.properties['acc:webvtt'];
+            }
+        }
+
         this.extensionChange.emit(this.extension);
         this.sidebarRightTemplateContext.node = nodeData;
         this.sidebarLeftTemplateContext.node = nodeData;
@@ -514,11 +522,11 @@ export class ViewerComponent implements OnChanges, OnInit, OnDestroy {
         this.close();
     }
 
-    onNavigateBeforeClick(event: MouseEvent|KeyboardEvent) {
+    onNavigateBeforeClick(event: MouseEvent | KeyboardEvent) {
         this.navigateBefore.next(event);
     }
 
-    onNavigateNextClick(event: MouseEvent|KeyboardEvent) {
+    onNavigateNextClick(event: MouseEvent | KeyboardEvent) {
         this.navigateNext.next(event);
     }
 
