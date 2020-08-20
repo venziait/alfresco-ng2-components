@@ -64,14 +64,22 @@ export class DynamicExtensionComponent implements OnChanges, OnDestroy {
     }
 
     private loadComponent() {
-        const componentType = this.extensions.getComponentById<ExtensionComponent>(this.id);
-        if (componentType) {
-            const factory = this.componentFactoryResolver.resolveComponentFactory(
-                componentType
-            );
-            if (factory) {
-                this.content.clear();
-                this.componentRef = this.content.createComponent(factory, 0);
+        if (this.id.startsWith('wc:')) {
+            const [, tag] = this.id.split(':');
+            const component = document.createElement(tag);
+
+            const host = this.content.element.nativeElement as HTMLDivElement;
+            host.appendChild(component);
+        } else {
+            const componentType = this.extensions.getComponentById<ExtensionComponent>(this.id);
+            if (componentType) {
+                const factory = this.componentFactoryResolver.resolveComponentFactory(
+                    componentType
+                );
+                if (factory) {
+                    this.content.clear();
+                    this.componentRef = this.content.createComponent(factory, 0);
+                }
             }
         }
     }
