@@ -42,5 +42,4 @@ const routes: Routes = [
     ],
     schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
 })
-export class WebComponentsModule {
-}
+export class WebComponentsModule {}
