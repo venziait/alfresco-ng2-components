@@ -23,8 +23,14 @@ import { environment } from './environments/environment';
 import 'chart.js';
 import 'ng2-charts';
 
+// Build a stencil web component and then import the defineCustomElements
+// Example: import { defineCustomElements } from '@alfresco/web-components/custom-elements';
+
 if (environment.production) {
     enableProdMode();
 }
 
 platformBrowserDynamic().bootstrapModule(AppModule);
+
+// Uncomment this line to load the custom components in the collection
+// defineCustomElements();
