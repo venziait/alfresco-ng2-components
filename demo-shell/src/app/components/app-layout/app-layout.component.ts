@@ -20,6 +20,13 @@ import { UserPreferencesService, AppConfigService, AlfrescoApiService, UserPrefe
 import { HeaderDataService } from '../header-data/header-data.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { HttpHeaders, HttpClient } from '@angular/common/http';
+import { HttpLink } from 'apollo-angular-link-http';
+import { InMemoryCache } from 'apollo-cache-inmemory';
+import { Apollo } from 'apollo-angular';
+import { split } from 'apollo-link';
+import { WebSocketLink } from 'apollo-link-ws';
+import { getMainDefinition } from 'apollo-utilities';
 
 @Component({
     templateUrl: 'app-layout.component.html',
@@ -156,10 +163,14 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
         private userPreferences: UserPreferencesService,
         private config: AppConfigService,
         private alfrescoApiService: AlfrescoApiService,
-        private headerService: HeaderDataService) {
+        private headerService: HeaderDataService,
+        private httpClient: HttpClient, private apollo: Apollo, private http: HttpLink) {
         if (this.alfrescoApiService.getInstance().isOauthConfiguration()) {
             this.enableRedirect = false;
         }
+
+        this.initializeNotificationService('notification-app');
+        this.configApolloClient('notification-app');
     }
 
     setState(state) {
@@ -167,4 +178,52 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
             this.userPreferences.set(UserPreferenceValues.ExpandedSideNavStatus, state);
         }
     }
+
+
+    configApolloClient(appName: string) {
+
+        const httpLink = this.http.create({
+            uri: `https://aaedev.envalfresco.com/${appName}/notifications/graphql`,
+        });
+
+        const webSocketLink = new WebSocketLink({
+            uri: `wss://aaedev.envalfresco.com/${appName}/notifications/ws/graphql`,
+            options: {
+                reconnect: true,
+                lazy: true,
+                connectionParams: {
+                    kaInterval: 2000,
+                    'X-Authorization': 'Bearer ' + localStorage.getItem('access_token'),
+                },
+            },
+        });
+
+        const link = split(
+            ({ query }) => {
+                const definition = getMainDefinition(query);
+                return definition.kind === 'OperationDefinition' && definition.operation === 'subscription';
+            },
+            webSocketLink,
+            httpLink
+        );
+
+        this.apollo.create(<any> {
+            link,
+            cache: new InMemoryCache({}),
+        });
+    }
+
+    initializeNotificationService(appName: string) {
+        if (appName) {
+            console.log(appName);
+            const bodyParam = JSON.stringify(`{hello}`);
+            const ss = { headers: new HttpHeaders({
+                'Authorization': 'Bearer ' + localStorage.getItem('access_token'),
+                'Content-Type': 'application/json; charset=utf-8'}) };
+            this.httpClient.post(`https://aaedev.envalfresco.com/${appName}/notifications/graphql`, bodyParam, ss).subscribe((d) => {
+                    console.log(d);
+            });
+        }
+    }
+
 }

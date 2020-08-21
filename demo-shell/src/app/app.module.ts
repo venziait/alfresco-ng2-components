@@ -81,6 +81,7 @@ import { DemoErrorComponent } from './components/error/demo-error.component';
 import { ProcessServicesCloudModule } from '@alfresco/adf-process-services-cloud';
 import { FilteredSearchComponent } from './components/files/filtered-search.component';
 import { RouterModule } from '@angular/router';
+import { HttpLinkModule } from 'apollo-angular-link-http';
 
 import { registerLocaleData } from '@angular/common';
 import localeFr from '@angular/common/locales/fr';
@@ -137,6 +138,7 @@ registerLocaleData(localeSv);
         ThemePickerModule,
         ChartsModule,
         AppCloudSharedModule,
+        HttpLinkModule,
         MonacoEditorModule.forRoot()
     ],
     declarations: [

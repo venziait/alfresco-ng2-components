@@ -22,8 +22,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatBadgeModule } from '@angular/material/badge';
-
+import { MatMenuModule } from '@angular/material/menu';
 import { UserActivityInfoComponent } from './user-activity-info.component';
+import { MatCardModule } from '@angular/material/card';
 
 @NgModule({
     imports: [
@@ -31,7 +32,9 @@ import { UserActivityInfoComponent } from './user-activity-info.component';
         MatIconModule,
         MatButtonModule,
         MatDividerModule,
-        MatBadgeModule
+        MatBadgeModule,
+        MatMenuModule,
+        MatCardModule
     ],
     declarations: [
         UserActivityInfoComponent

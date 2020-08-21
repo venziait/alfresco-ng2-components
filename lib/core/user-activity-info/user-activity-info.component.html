@@ -1,4 +1,4 @@
-<div class="adf-container">
+<!-- <div class="adf-container">
   <div *ngIf="showNotifications && updates.length" class="adf-snack-bar-container">
     <div>
       <h3>Notifications</h3>
@@ -17,7 +17,7 @@
             <strong><em>{{activity.data.task_name}}</em></strong> has been completed successfully.
           </p>
         </span>
-      
+
       <button mat-icon-button (click)="removeNotification(i)">
         <mat-icon>close</mat-icon>
       </button>
@@ -26,4 +26,14 @@
   <button mat-mini-fab *ngIf="updates.length > 0" color="primary" [attr.aria-label]="updates.length" (click)="showNotifications = !showNotifications">
     <mat-icon [matBadge]="updates.length" matBadgeColor="warn">notifications</mat-icon>
   </button>
-</div>
+</div> -->
+
+<ng-container *ngIf="notifications.length">
+    <button mat-icon-button [matMenuTriggerFor]="menu" color="primary" [attr.aria-label]="notifications.length" (click)="showNotifications = !showNotifications">
+        <mat-icon [matBadge]="getNotificationCount()" matBadgeColor="warn">notifications</mat-icon>
+    </button>
+
+    <mat-menu #menu="matMenu">
+        <mat-card  *ngFor="let notification of notifications">{{getMessage(notification)}}</mat-card>
+    </mat-menu>
+</ng-container>

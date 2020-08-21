@@ -20,8 +20,9 @@ import {
     ViewEncapsulation,
     OnInit
 } from '@angular/core';
-import { interval, of } from 'rxjs';
-import { switchMap, take } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
+import { Apollo } from 'apollo-angular';
+import gql from 'graphql-tag';
 
 @Component({
     selector: 'adf-user-activity-info',
@@ -30,51 +31,78 @@ import { switchMap, take } from 'rxjs/operators';
     encapsulation: ViewEncapsulation.None
 })
 export class UserActivityInfoComponent implements OnInit {
-    updates = [];
+    notifications = [];
     badgeValue;
     showNotifications = false;
-    iconConfig = {
-        'TASK_CLAIMED': 'accent',
-        'TASK_CREATED': 'warn',
-        'TASK_COMPLETED': 'primary'
-    };
 
+    subscriptionQuery = gql`
+        subscription {
+            engineEvents(eventType: [TASK_CREATED, TASK_UPDATED, PROCESS_STARTED, TASK_ASSIGNED]) {
+                eventType
+                entity
+            }
+        }
+    `;
+
+    constructor(private apollo: Apollo) {
+        this.apollo
+            .watchQuery({
+                query: gql`
+                    {
+                        hello
+                    }
+                `,
+            })
+            .valueChanges.subscribe(({ data }) => {
+                // console.log('hello query', data);
+            });
+    }
     ngOnInit() {
-        setTimeout(() => this.setUpdates(), 5000);
+        this.listen();
     }
 
-    setUpdates() {
-        interval(1000)
-        .pipe(
-            take(30),
-            switchMap(() => of(
-                {
-                    type: 'TASK_CLAIMED',
-                    data: {
-                        task_name: 'Supplier_Task',
-                        claimer: 'Admin Admin'
-                    }
-                },
-                {
-                    type: 'TASK_CREATED',
-                    data: {
-                        task_name: 'Approval_Task'
-                    }
-                },
-                {
-                    type: 'TASK_COMPLETED',
-                    data: {
-                        task_name: 'Invoice_Task_3'
-                    }
-                }
-            ))
-        )
-        .subscribe((notification) => {
-            this.updates.push(notification);
-        });
+    listen() {
+        this.apollo
+            .subscribe({ query: this.subscriptionQuery })
+            .pipe(
+                map((events: any) => {
+                    return events.data.engineEvents;
+                })
+            )
+            .subscribe((result) => {
+                this.notifications = [].concat(result);
+            });
     }
 
-    removeNotification(index) {
-        this.updates.splice(index, 1);
+    getNotificationCount(): any {
+        return this.notifications.length ? this.notifications.length : '';
+    }
+
+    getMessage(notification: any) {
+        let name = '';
+        switch (notification.eventType) {
+            case 'TASK_ASSIGNED': {
+                name = `${notification.entity.name} task has been assigned to ${notification.entity.assignee}`;
+                break;
+            }
+            case 'TASK_CREATED': {
+                name = `${notification.entity.name} task has been created`;
+                break;
+            }
+            case 'PROCESS_STARTED': {
+                name = `${notification.entity.name} process has been started`;
+                break;
+            }
+            case 'TASK_UPDATED': {
+                name = `${notification.entity.name} task details has been updated`;
+                break;
+            }
+            default: {
+                name = 'No notifications';
+                break;
+            }
+        }
+
+        return name;
     }
 }
