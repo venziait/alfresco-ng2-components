@@ -7,4 +7,8 @@
         max-height: 90vh;
         max-width: 100%;
     }
+
+    video::-webkit-media-text-track-container {
+        bottom: 50%;
+    }
 }

@@ -43,7 +43,7 @@ export class MediaPlayerComponent implements OnChanges {
     @Input()
     webVTT: string;
 
-    @ViewChild('videoPlayer')
+    @ViewChild('videoPlayer', { static: true })
     videoPlayer: ElementRef;
 
     constructor(private contentService: ContentService, private webVTTValidatorService: WebVTTValidatorService) { }
@@ -60,7 +60,7 @@ export class MediaPlayerComponent implements OnChanges {
         }
 
         if (this.webVTT) {
-            const track: TextTrack = this.videoPlayer.nativeElement.addTextTrack('caption', 'Captions');
+            const track: TextTrack = this.videoPlayer.nativeElement.addTextTrack('captions', 'Captions');
             if (this.addCuesFromWebVTT(track, this.webVTT)) {
                 track.mode = 'showing';
             }
