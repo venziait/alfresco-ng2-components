@@ -23,8 +23,12 @@ import { environment } from './environments/environment';
 import 'chart.js';
 import 'ng2-charts';
 
+// Import the lit-element js file
+// import './app/web-components/lit-element';
+
 // Build a stencil web component and then import the defineCustomElements
-// Example: import { defineCustomElements } from '@alfresco/web-components/custom-elements';
+// Example:
+// import { defineCustomElements } from '@alfresco/web-components/custom-elements';
 
 if (environment.production) {
     enableProdMode();

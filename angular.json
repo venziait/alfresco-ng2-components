@@ -123,6 +123,7 @@
             ],
             "scripts": [
               "demo-shell/src/app/web-components/hello.js",
+              "demo-shell/src/app/web-components/lit-element.js",
               "node_modules/pdfjs-dist/build/pdf.js",
               "node_modules/pdfjs-dist/web/pdf_viewer.js",
               "node_modules/raphael/raphael.min.js",
