@@ -16,11 +16,12 @@
  */
 
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, OnDestroy, OnInit } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, interval, iif, of } from 'rxjs';
 import { TaskFilterCloudService } from '../services/task-filter-cloud.service';
 import { TaskFilterCloudModel, FilterParamsModel } from '../models/filter-cloud.model';
 import { TranslationService } from '@alfresco/adf-core';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, filter, switchMap } from 'rxjs/operators';
+import { Router, NavigationEnd } from '@angular/router';
 
 @Component({
     selector: 'adf-cloud-task-filters',
@@ -61,22 +62,25 @@ export class TaskFiltersCloudComponent implements OnInit, OnChanges, OnDestroy {
 
     filters: TaskFilterCloudModel [] = [];
 
+    newTasks = null;
+
     private onDestroy$ = new Subject<boolean>();
 
-    constructor(private taskFilterCloudService: TaskFilterCloudService, private translationService: TranslationService) {
+    constructor(private taskFilterCloudService: TaskFilterCloudService, private translationService: TranslationService, private router: Router) {
     }
 
     ngOnInit() {
         this.getFilters(this.appName);
+        this.setTaskUpdates();
     }
 
     ngOnChanges(changes: SimpleChanges) {
         const appName = changes['appName'];
-        const filter = changes['filterParam'];
+        const filterParam = changes['filterParam'];
         if (appName && appName.currentValue !== appName.previousValue) {
             this.getFilters(appName.currentValue);
-        } else if (filter && filter.currentValue !== filter.previousValue) {
-            this.selectFilterAndEmit(filter.currentValue);
+        } else if (filterParam && filterParam.currentValue !== filterParam.previousValue) {
+            this.selectFilterAndEmit(filterParam.currentValue);
         }
     }
 
@@ -106,10 +110,10 @@ export class TaskFiltersCloudComponent implements OnInit, OnChanges, OnDestroy {
 
     public selectFilter(paramFilter: FilterParamsModel) {
         if (paramFilter) {
-            this.currentFilter = this.filters.find( (filter: TaskFilterCloudModel, index) =>
+            this.currentFilter = this.filters.find( (listFilter: TaskFilterCloudModel, index) =>
                 paramFilter.index === index ||
-                paramFilter.key === filter.key ||
-                paramFilter.id === filter.id ||
+                paramFilter.key === listFilter.key ||
+                paramFilter.id === listFilter.id ||
                 (paramFilter.name &&
                     (paramFilter.name.toLocaleLowerCase() === this.translationService.instant(filter.name).toLocaleLowerCase())
                 ));
@@ -154,5 +158,31 @@ export class TaskFiltersCloudComponent implements OnInit, OnChanges, OnDestroy {
     private resetFilter() {
         this.filters = [];
         this.currentFilter = undefined;
+    }
+
+    private setTaskUpdates() {
+        this.router.events.pipe(
+            filter(e => e instanceof NavigationEnd)
+        )
+        .pipe(
+            switchMap(
+                (event: NavigationEnd) => iif(
+                    () => event.url.includes('ADF_CLOUD_TASK_FILTERS.MY_TASKS'),
+                    of(null),
+                    interval(1000) // add push service here
+                )
+            )
+        )
+        .subscribe((res) => {
+            if (!res) {
+                this.newTasks = null;
+            } else {
+                this.newTasks += 1;
+            }
+        });
+    }
+
+    getNewTasks(viewFilter) {
+        return viewFilter.name === 'ADF_CLOUD_TASK_FILTERS.MY_TASKS' ? this.newTasks : null;
     }
 }

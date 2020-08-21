@@ -42,6 +42,7 @@ import { ButtonsMenuModule } from './buttons-menu/buttons-menu.module';
 import { TemplateModule } from './templates/template.module';
 import { ClipboardModule } from './clipboard/clipboard.module';
 import { NotificationHistoryModule } from './notifications/notification-history.module';
+import { UserActivityInfoModule } from './user-activity-info/user-activity-info.module';
 
 import { DirectiveModule } from './directives/directive.module';
 import { DialogModule } from './dialogs/dialog.module';
@@ -93,6 +94,7 @@ import { VersionCompatibilityService } from './services/version-compatibility.se
         IconModule,
         SortingPickerModule,
         NotificationHistoryModule,
+        UserActivityInfoModule,
         SearchTextModule
     ],
     exports: [
@@ -127,6 +129,7 @@ import { VersionCompatibilityService } from './services/version-compatibility.se
         SortingPickerModule,
         IconModule,
         NotificationHistoryModule,
+        UserActivityInfoModule,
         SearchTextModule
     ]
 })

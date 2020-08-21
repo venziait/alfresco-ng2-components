@@ -21,9 +21,12 @@ import { TaskQueryCloudRequestModel } from '../models/filter-cloud-model';
 import { Observable, throwError } from 'rxjs';
 import { TaskListCloudSortingModel } from '../models/task-list-sorting.model';
 import { BaseCloudService } from '../../../services/base-cloud.service';
+import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
 
 @Injectable({ providedIn: 'root' })
 export class TaskListCloudService extends BaseCloudService {
+
+    myWebSocket: WebSocketSubject<any> = webSocket('wss://echo.websocket.org/');
 
     constructor(apiService: AlfrescoApiService,
                 appConfigService: AppConfigService,

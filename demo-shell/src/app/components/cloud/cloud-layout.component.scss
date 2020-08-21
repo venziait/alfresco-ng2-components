@@ -5,3 +5,10 @@
 .app-cloud-layout-tab-body .mat-tab-body-wrapper {
   height: 100%;
 }
+
+adf-user-activity-info {
+  position: absolute;
+  right: 40px;
+  top: 10px;
+  z-index: 100;
+}

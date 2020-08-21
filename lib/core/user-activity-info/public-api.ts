@@ -15,23 +15,5 @@
  * limitations under the License.
  */
 
-import { NgModule } from '@angular/core';
-import { IconComponent } from './icon.component';
-import { MatIconModule } from '@angular/material/icon';
-import { CommonModule } from '@angular/common';
-import { MatBadgeModule } from '@angular/material/badge';
-
-@NgModule({
-    imports: [
-        CommonModule,
-        MatIconModule,
-        MatBadgeModule
-    ],
-    declarations: [
-        IconComponent
-    ],
-    exports: [
-        IconComponent
-    ]
-})
-export class IconModule {}
+export * from './user-activity-info.component';
+export * from './user-activity-info.module';

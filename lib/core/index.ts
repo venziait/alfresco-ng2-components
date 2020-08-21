@@ -43,6 +43,7 @@ export * from './dialogs/index';
 export * from './icon/index';
 export * from './notifications/index';
 export * from './search-text/index';
+export * from './user-activity-info/index';
 
 export * from './utils/index';
 export * from './interface/index';

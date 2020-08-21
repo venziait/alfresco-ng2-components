@@ -16,22 +16,28 @@
  */
 
 import { NgModule } from '@angular/core';
-import { IconComponent } from './icon.component';
-import { MatIconModule } from '@angular/material/icon';
+
 import { CommonModule } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatDividerModule } from '@angular/material/divider';
 import { MatBadgeModule } from '@angular/material/badge';
+
+import { UserActivityInfoComponent } from './user-activity-info.component';
 
 @NgModule({
     imports: [
         CommonModule,
         MatIconModule,
+        MatButtonModule,
+        MatDividerModule,
         MatBadgeModule
     ],
     declarations: [
-        IconComponent
+        UserActivityInfoComponent
     ],
     exports: [
-        IconComponent
+        UserActivityInfoComponent
     ]
 })
-export class IconModule {}
+export class UserActivityInfoModule {}

@@ -1,7 +1,7 @@
 <ng-container *ngIf="isCustom; else: default">
-  <mat-icon [color]="color" [svgIcon]="value"></mat-icon>
+  <mat-icon [color]="color" [matBadge]="badgeValue" matBadgeColor="primary" [svgIcon]="value"></mat-icon>
 </ng-container>
 
 <ng-template #default>
-  <mat-icon [color]="color">{{ value }}</mat-icon>
+  <mat-icon [color]="color" [matBadge]="badgeValue" matBadgeColor="primary">{{ value }}</mat-icon>
 </ng-template>

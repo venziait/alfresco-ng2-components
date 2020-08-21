@@ -201,6 +201,15 @@ export class TaskListCloudComponent extends DataTableSchema implements OnChanges
             .select(UserPreferenceValues.PaginationSize)
             .pipe(takeUntil(this.onDestroy$))
             .subscribe(pageSize => this.size = pageSize);
+
+        // this.taskListCloudService.myWebSocket.subscribe(
+        //     msg => console.log('message received: ' + msg),
+        //     // Called whenever there is a message from the server
+        //     err => console.log(err),
+        //     // Called if WebSocket API signals some kind of error
+        //     () => console.log('complete')
+        //     // Called when connection is closed (for whatever reason)
+        //  );
     }
 
     ngOnChanges(changes: SimpleChanges) {

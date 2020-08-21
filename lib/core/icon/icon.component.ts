@@ -39,6 +39,9 @@ export class IconComponent {
     @Input()
     color: ThemePalette;
 
+    @Input()
+    badgeValue: number;
+
     get value(): string {
         return this._value;
     }

@@ -36,6 +36,7 @@
 @import '../login/components/login-dialog-panel.component';
 @import '../../core/clipboard/clipboard.component';
 @import '../../core/search-text/search-text-input.component';
+@import '../../core/user-activity-info/user-activity-info.component';
 @import './snackbar';
 
 @mixin adf-core-theme($theme) {
@@ -79,4 +80,5 @@
     @include mat-calendar-theme--fix($theme);
     @include mat-datetimepicker-theme--fix($theme);
     @include adf-search-text-input-theme($theme);
+    @include adf-user-activity-info-theme($theme);
 }

@@ -1,0 +1,29 @@
+<div class="adf-container">
+  <div *ngIf="showNotifications && updates.length" class="adf-snack-bar-container">
+    <div>
+      <h3>Notifications</h3>
+      <mat-divider></mat-divider>
+    </div>
+    <div class="adf-snack-bar" *ngFor="let activity of updates; let i = index">
+        <span [ngSwitch]="activity.type">
+          <mat-icon [color]="iconConfig[activity.type]">fiber_manual_record</mat-icon>
+          <p *ngSwitchCase="'TASK_CREATED'">
+            <strong><em>{{activity.data.task_name}}</em></strong> has been assigned to you.
+          </p>
+          <p *ngSwitchCase="'TASK_CLAIMED'">
+            <strong><em>{{activity.data.task_name}}</em></strong> has been claimed by <em>{{activity.data.claimer}}</em>.
+          </p>
+          <p *ngSwitchCase="'TASK_COMPLETED'">
+            <strong><em>{{activity.data.task_name}}</em></strong> has been completed successfully.
+          </p>
+        </span>
+      
+      <button mat-icon-button (click)="removeNotification(i)">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+  <button mat-mini-fab *ngIf="updates.length > 0" color="primary" [attr.aria-label]="updates.length" (click)="showNotifications = !showNotifications">
+    <mat-icon [matBadge]="updates.length" matBadgeColor="warn">notifications</mat-icon>
+  </button>
+</div>
