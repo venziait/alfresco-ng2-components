@@ -25,8 +25,8 @@ import moment from 'moment-es6';
 import { Moment } from 'moment';
 
 import { AppsProcessCloudService } from '../../../app/services/apps-process-cloud.service';
-import { ProcessFilterCloudModel, ProcessFilterProperties, ProcessFilterAction, ProcessFilterOptions } from '../models/process-filter-cloud.model';
-import { TranslationService, UserPreferencesService, UserPreferenceValues } from '@alfresco/adf-core';
+import { ProcessFilterCloudModel, ProcessFilterProperties, ProcessFilterAction, ProcessFilterOptions, ProcessSortFilterProperties } from '../models/process-filter-cloud.model';
+import { TranslationService, UserPreferencesService, UserPreferenceValues, IdentityUserModel } from '@alfresco/adf-core';
 import { ProcessFilterCloudService } from '../services/process-filter-cloud.service';
 import { ProcessFilterDialogCloudComponent } from './process-filter-dialog-cloud.component';
 import { ApplicationInstanceModel } from '../../../app/models/application-instance.model';
@@ -309,6 +309,10 @@ export class EditProcessFilterCloudComponent implements OnInit, OnChanges, OnDes
         }
     }
 
+    onUsersChange(users: IdentityUserModel[], property: ProcessFilterProperties) {
+        this.getPropertyController(property).setValue(users.map(user => user.username));
+    }
+
     hasError(property: ProcessFilterProperties): boolean {
         return this.getPropertyController(property).errors && this.getPropertyController(property).errors.invalid;
     }
@@ -468,6 +472,10 @@ export class EditProcessFilterCloudComponent implements OnInit, OnChanges, OnDes
         return this.isDisabledForDefaultFilters(action) ? true : this.hasFormChanged(action);
     }
 
+    isUserSelectionType(property: ProcessFilterProperties): boolean {
+        return property.type === 'user';
+    }
+
     isDisabledForDefaultFilters(action: ProcessFilterAction): boolean {
         return (
             this.processFilterCloudService.isDefaultFilter(this.processFilter.name) &&
@@ -610,6 +618,12 @@ export class EditProcessFilterCloudComponent implements OnInit, OnChanges, OnDes
                 key: 'order',
                 value: currentProcessFilter.order || this.directions[0].value,
                 options: this.directions
+            }),
+            new ProcessFilterProperties({
+                label: 'StartedBy',
+                type: 'user',
+                key: 'startedBy',
+                value: currentProcessFilter.startedBy || []
             })
         ];
     }

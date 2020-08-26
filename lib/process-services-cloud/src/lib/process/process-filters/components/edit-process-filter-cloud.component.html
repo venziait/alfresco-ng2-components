@@ -66,6 +66,13 @@
                             </div>
                         </div>
                         </mat-form-field>
+
+                        <adf-cloud-people *ngIf="isUserSelectionType(processFilterProperty)"
+                            [appName]="appName"
+                            [title]="processFilterProperty.label"
+                            [mode]= "'multiple'"
+                            [userChipsCtrl]="getPropertyController(processFilterProperty)"
+                            (changedUsers)="onUsersChange($event, processFilterProperty)"></adf-cloud-people>
                     </ng-container>
                 </div>
             </form>

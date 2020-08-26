@@ -19,7 +19,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { SimpleChange } from '@angular/core';
 import { By } from '@angular/platform-browser';
 
-import { setupTestBed } from '@alfresco/adf-core';
+import { setupTestBed, AlfrescoApiService } from '@alfresco/adf-core';
 import { ProcessServiceCloudTestingModule } from '../../../testing/process-service-cloud.testing.module';
 import { MatDialog } from '@angular/material/dialog';
 import { of } from 'rxjs';
@@ -47,6 +47,7 @@ describe('EditProcessFilterCloudComponent', () => {
     let processService: ProcessCloudService;
     let getRunningApplicationsSpy: jasmine.Spy;
     let getProcessFilterByIdSpy: jasmine.Spy;
+    let alfrescoApiService: AlfrescoApiService;
 
     const fakeFilter = new ProcessFilterCloudModel({
         name: 'FakeRunningProcess',
@@ -59,6 +60,12 @@ describe('EditProcessFilterCloudComponent', () => {
         order: 'ASC',
         sort: 'id'
     });
+
+    const mock = {
+        oauth2Auth: {
+            callCustomApi: () => Promise.resolve(fakeApplicationInstance)
+        }
+    };
 
     setupTestBed({
         imports: [
@@ -78,6 +85,7 @@ describe('EditProcessFilterCloudComponent', () => {
         service = TestBed.inject(ProcessFilterCloudService);
         appsService = TestBed.inject(AppsProcessCloudService);
         processService = TestBed.inject(ProcessCloudService);
+        alfrescoApiService = TestBed.inject(AlfrescoApiService);
         dialog = TestBed.inject(MatDialog);
         spyOn(dialog, 'open').and.returnValue({
             afterClosed() {
@@ -90,6 +98,7 @@ describe('EditProcessFilterCloudComponent', () => {
         });
         getProcessFilterByIdSpy = spyOn(service, 'getFilterById').and.returnValue(of(fakeFilter));
         getRunningApplicationsSpy = spyOn(appsService, 'getDeployedApplicationsByStatus').and.returnValue(of(fakeApplicationInstance));
+        spyOn(alfrescoApiService, 'getInstance').and.returnValue(mock);
         fixture.detectChanges();
     });
 
@@ -739,6 +748,22 @@ describe('EditProcessFilterCloudComponent', () => {
 
             component.filterChange.subscribe(() => {
                 expect(component.changedProcessFilter.lastModifiedTo.toISOString()).toEqual(lastModifiedToFilter.toISOString());
+                done();
+            });
+            component.onFilterChange();
+        });
+
+        it('should show startedBy user selection', (done) => {
+            component.appName = 'fake';
+            component.filterProperties = ['startedBy'];
+            const taskFilterIdChange = new SimpleChange(undefined, 'mock-task-filter-id', true);
+            component.ngOnChanges({ 'id': taskFilterIdChange });
+            fixture.detectChanges();
+
+            const startedByControl: AbstractControl = component.editProcessFilterForm.get('startedBy');
+            startedByControl.setValue(['user1']);
+            component.filterChange.subscribe(() => {
+                expect(component.changedProcessFilter.startedBy).toEqual(startedByControl.value);
                 done();
             });
             component.onFilterChange();

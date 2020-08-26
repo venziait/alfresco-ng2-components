@@ -91,6 +91,10 @@ export class ProcessListCloudComponent extends DataTableSchema implements OnChan
     @Input()
     lastModifiedTo: string = '';
 
+    /** Filter the processes. Display only process with startedBy equal to the supplied values. */
+    @Input()
+    startedBy: string[] = [];
+
     /**
      * Row selection mode. Can be "none", "single" or "multiple".
      * For multiple mode, you can use Cmd (macOS) or Ctrl (Win) modifier
@@ -318,6 +322,7 @@ export class ProcessListCloudComponent extends DataTableSchema implements OnChan
             businessKey: this.businessKey,
             lastModifiedFrom: this.lastModifiedFrom,
             lastModifiedTo: this.lastModifiedTo,
+            startedBy: this.startedBy?.join(','),
             sorting: this.sorting
         };
         return new ProcessQueryCloudRequestModel(requestNode);

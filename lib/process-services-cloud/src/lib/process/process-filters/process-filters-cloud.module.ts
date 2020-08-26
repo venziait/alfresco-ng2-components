@@ -27,6 +27,7 @@ import { EditProcessFilterCloudComponent } from './components/edit-process-filte
 import { ProcessFilterDialogCloudComponent } from './components/process-filter-dialog-cloud.component';
 import { AppListCloudModule } from './../../app/app-list-cloud.module';
 import { DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
+import { PeopleCloudModule } from '../../people/public-api';
 
 @NgModule({
     imports: [
@@ -37,6 +38,7 @@ import { DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
         FlexLayoutModule,
         MaterialModule,
         AppListCloudModule,
+        PeopleCloudModule,
         CoreModule
 
     ],

@@ -58,7 +58,8 @@ describe('ProcessFilterCloudService', () => {
         processDefinitionKey: 'processDefKey',
         lastModified: null,
         lastModifiedTo: null,
-        lastModifiedFrom: null
+        lastModifiedFrom: null,
+        startedBy: null
     };
 
     const fakeProcessCloudFilterEntries = {
