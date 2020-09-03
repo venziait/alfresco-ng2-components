@@ -1490,6 +1490,7 @@ describe('DocumentList', () => {
     });
 
     it('should reset the pagination when enter in a new folder', () => {
+        documentList.ngOnChanges({ currentFolderId: new SimpleChange(undefined, 'fake-id', true) });
         const folder = new FolderNode();
         documentList.navigationMode = DocumentListComponent.SINGLE_CLICK_NAVIGATION;
         documentList.updatePagination({
@@ -1500,7 +1501,7 @@ describe('DocumentList', () => {
         expect(documentListService.getFolder).toHaveBeenCalledWith(null, Object({
             maxItems: 10,
             skipCount: 10,
-            orderBy: ['name asc'],
+            orderBy: ['isFolder desc', 'name asc'],
             rootFolderId: 'no-node',
             where: undefined
         }), undefined);
@@ -1510,7 +1511,7 @@ describe('DocumentList', () => {
         expect(documentListService.getFolder).toHaveBeenCalledWith(null, Object({
             maxItems: 25,
             skipCount: 0,
-            orderBy: ['name asc'],
+            orderBy: ['isFolder desc', 'name asc'],
             rootFolderId: 'folder-id',
             where: undefined
         }), undefined);
