@@ -28,8 +28,8 @@ import { AppConfigService, AppConfigValues } from '../app-config/app-config.serv
 import { Subject, Observable } from 'rxjs';
 import { OauthConfigModel } from '../models/oauth-config.model';
 import { StorageService } from './storage.service';
-import { Oauth2Auth0 } from 'core/authentication/oauth2Auth0';
-import { Auth0Service } from 'core/authentication/auth0.service';
+import { Oauth2Auth0 } from '../authentication/oauth2Auth0';
+import { Auth0Service } from '../authentication/auth0.service';
 
 /* tslint:disable:adf-file-name */
 
@@ -103,8 +103,7 @@ export class AlfrescoApiService {
 
     constructor(
         protected appConfig: AppConfigService,
-        protected storageService: StorageService,
-        protected auth0Service: Auth0Service ) {
+        protected storageService: StorageService) {
         this.alfrescoApiInitializedSubject = new Subject();
         this.alfrescoApiInitialized = this.alfrescoApiInitializedSubject.asObservable();
     }
@@ -140,14 +139,16 @@ export class AlfrescoApiService {
             oauth2: oauth
         });
 
+        const auth0Service = new Auth0Service(config);
+
         if (this.alfrescoApi && this.isDifferentConfig(this.lastConfig, config)) {
             this.lastConfig = config;
             this.alfrescoApi.configureJsApi(config);
-            this.alfrescoApi.setOAuth2(new Oauth2Auth0(config, this.alfrescoApi, this.auth0Service));
+            this.alfrescoApi.setOAuth2(new Oauth2Auth0(config, this.alfrescoApi, auth0Service));
         } else {
             this.lastConfig = config;
             this.alfrescoApi = new AlfrescoApiCompatibility(config);
-            this.alfrescoApi.setOAuth2(new Oauth2Auth0(config, this.alfrescoApi, this.auth0Service));
+            this.alfrescoApi.setOAuth2(new Oauth2Auth0(config, this.alfrescoApi, auth0Service));
         }
 
     }

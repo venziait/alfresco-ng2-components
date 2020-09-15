@@ -52,11 +52,11 @@ export class AuthenticationService {
      * Checks if the user logged in.
      * @returns True if logged in, false otherwise
      */
-    isLoggedIn(): boolean {
+    isLoggedIn(): Observable<boolean> | boolean {
         if (!this.isOauth() && this.cookie.isEnabled() && !this.isRememberMeSet()) {
             return false;
         }
-        return this.alfrescoApi.getInstance().isLoggedIn();
+        return  this.alfrescoApi.getInstance().isLoggedIn();
     }
 
     /**

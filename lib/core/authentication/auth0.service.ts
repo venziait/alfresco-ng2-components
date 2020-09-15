@@ -15,17 +15,12 @@
  * limitations under the License.
  */
 
-import { Injectable } from '@angular/core';
 import createAuth0Client, { RedirectLoginResult } from '@auth0/auth0-spa-js';
 import Auth0Client from '@auth0/auth0-spa-js/dist/typings/Auth0Client';
 import { from, of, Observable, BehaviorSubject, combineLatest, throwError } from 'rxjs';
 import { tap, catchError, concatMap, shareReplay } from 'rxjs/operators';
-import { Router } from '@angular/router';
 import { AlfrescoApiConfig } from '@alfresco/js-api';
 
-@Injectable({
-  providedIn: 'root'
-})
 export class Auth0Service {
   // Create an observable of Auth0 instance of client
   auth0Client$: Observable<Auth0Client>;
@@ -41,7 +36,7 @@ export class Auth0Service {
   // Create a local property for login status
   loggedIn: boolean = null;
 
-  constructor(private router: Router, public config: AlfrescoApiConfig) {
+  constructor(public config: AlfrescoApiConfig) {
 
     this.auth0Client$ =  (from(
           createAuth0Client({
@@ -93,7 +88,7 @@ export class Auth0Service {
         return of(loggedIn);
       })
     );
-    checkAuth$.subscribe();
+    checkAuth$.subscribe(null);
   }
 
   login(redirectPath: string = '/') {
@@ -113,7 +108,7 @@ export class Auth0Service {
     // Call when app reloads after user logs in with Auth0
     const params = window.location.search;
     if (params.includes('code=') && params.includes('state=')) {
-      let targetRoute: string; // Path to redirect to after login processsed
+      let targetRoute: string; // Path to redirect to after login processed
       const authComplete$ = this.handleRedirectCallback$.pipe(
         // Have client, now call method to handle auth callback redirect
         tap(cbRes => {
@@ -129,10 +124,10 @@ export class Auth0Service {
         })
       );
       // Subscribe to authentication completion observable
-      // Response will be an array of user and login status
-      authComplete$.subscribe(([user, loggedIn]) => {
+      // Response will be an array of user and login status [user, loggedIn]
+      authComplete$.subscribe(() => {
         // Redirect to target route after callback processing
-        this.router.navigateByUrl(targetRoute);
+         window.location.href = targetRoute;
       });
     }
   }

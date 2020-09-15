@@ -15,28 +15,15 @@
  * limitations under the License.
  */
 
-import * as ee from 'event-emitter';
 import { AlfrescoApiConfig, AuthenticationApi, AlfrescoApi, Oauth2Auth } from '@alfresco/js-api';
-import * as _minimatch from 'minimatch';
-import { Authentication } from '@alfresco/js-api/src/authentication/authentication';
+import { Observable } from 'rxjs';
+import { tap, timeout } from 'rxjs/operators';
 import { Auth0Service } from './auth0.service';
-import { EventEmitter } from '@angular/core';
-
-const minimatch = _minimatch;
 
 declare let window: Window;
 
 export class Oauth2Auth0 extends Oauth2Auth {
 
-    hashFragmentParams: any;
-    token: string;
-    discovery: any = {};
-
-    authentications: Authentication = {
-        'oauth2': { accessToken: '' }, type: 'oauth2', 'basicAuth': {}
-    };
-
-    iFrameHashListener: any;
     auth0Service: Auth0Service;
 
     constructor(config: AlfrescoApiConfig, alfrescoApi: AlfrescoApi, auth0Service: Auth0Service) {
@@ -89,7 +76,7 @@ export class Oauth2Auth0 extends Oauth2Auth {
 
             this.host = this.config.oauth2.host;
 
-            // this.discoveryUrls();
+            this.discoveryUrls();
 
             if (this.hasContentProvider()) {
                 this.exchangeTicketListener(alfrescoApi);
@@ -108,116 +95,6 @@ export class Oauth2Auth0 extends Oauth2Auth {
         if (this.config.oauth2.implicitFlow) {
             await this.checkFragment();
         }
-    }
-
-    discoveryUrls() {
-        this.discovery.loginUrl = `${this.host}/oauth2/authorize`;
-        this.discovery.logoutUrl = `${this.host}/oauth2/revoke`;
-        this.discovery.tokenEndpoint = `${this.host}/oauth2/token`;
-    }
-
-    hasContentProvider(): boolean {
-        return this.config.provider === 'ECM' || this.config.provider === 'ALL';
-    }
-
-    checkFragment(externalHash?: any): any {// jshint ignore:line
-        this.hashFragmentParams = this.getHashFragmentParams(externalHash);
-
-        if (externalHash === undefined && this.isValidAccessToken()) {
-            const accessToken = this.storage.getItem('access_token');
-            this.setToken(accessToken, null);
-            this.silentRefresh();
-            return accessToken;
-        }
-
-        if (this.hashFragmentParams) {
-            const accessToken = this.hashFragmentParams.access_token;
-            const idToken = this.hashFragmentParams.id_token;
-            const sessionState = this.hashFragmentParams.session_state;
-            const expiresIn = this.hashFragmentParams.expires_in;
-
-            if (!sessionState) {
-                throw new Error(('session state not present'));
-            }
-
-            const jwt = this.processJWTToken(idToken);
-            try {
-                if (jwt) {
-                    this.storeIdToken(idToken, jwt.payload.exp);
-                    this.storeAccessToken(accessToken, expiresIn);
-                    this.authentications.basicAuth.username = jwt.payload.preferred_username;
-                    this.saveUsername(jwt.payload.preferred_username);
-                    this.silentRefresh();
-                    return accessToken;
-                }
-            } catch (error) {
-                throw new Error(('Validation JWT error' + error));
-            }
-
-        } else {
-            if (this.config.oauth2.silentLogin && !this.isPublicUrl()) {
-                this.implicitLogin();
-            }
-        }
-
-    }
-
-    isPublicUrl(): boolean {
-        const publicUrls = this.config.oauth2.publicUrls || [];
-
-        if (Array.isArray(publicUrls)) {
-            return publicUrls.length &&
-                publicUrls.some((urlPattern: string) => minimatch(window.location.href, urlPattern));
-        }
-        return false;
-    }
-
-    padBase64(base64data: any) {
-        while (base64data.length % 4 !== 0) {
-            base64data += '=';
-        }
-        return base64data;
-    }
-
-    processJWTToken(jwt: any): any {
-        if (jwt) {
-            const jwtArray = jwt.split('.');
-            const headerBase64 = this.padBase64(jwtArray[0]);
-            const headerJson = this.b64DecodeUnicode(headerBase64);
-            const header = JSON.parse(headerJson);
-
-            const payloadBase64 = this.padBase64(jwtArray[1]);
-            const payloadJson = this.b64DecodeUnicode(payloadBase64);
-            const payload = JSON.parse(payloadJson);
-
-            const savedNonce = this.storage.getItem('nonce');
-
-            if (!payload.sub) {
-                throw new Error(('Missing sub in JWT'));
-            }
-
-            if (payload.nonce !== savedNonce) {
-                throw new Error(('Failing nonce JWT is not corrisponding' + payload.nonce));
-            }
-
-            return {
-                idToken: jwt,
-                payload: payload,
-                header: header
-            };
-        }
-    }
-
-    b64DecodeUnicode(b64string: string) {
-        const base64 = b64string.replace(/\-/g, '+').replace(/\_/g, '/');
-        return decodeURIComponent(
-            atob(base64)
-                .split('')
-                .map((c) => {
-                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-                })
-                .join('')
-        );
     }
 
     storeIdToken(idToken: string, exp: number) {
@@ -296,57 +173,6 @@ export class Oauth2Auth0 extends Oauth2Auth {
         }
     }
 
-    genNonce(): string {
-        let text = '';
-        const possible =
-            'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-
-        for (let i = 0; i < 40; i++) {
-            text += possible.charAt(Math.floor(Math.random() * possible.length));
-        }
-
-        return text;
-    }
-
-    hasHashCharacter(hash: string): boolean {
-        return hash.indexOf('#') === 0;
-    }
-
-    startWithHashRoute(hash: string) {
-        return hash.startsWith('#/');
-    }
-
-    getHashFragmentParams(externalHash: string): string {
-        let hashFragmentParams = null;
-
-        if (typeof window !== 'undefined') {
-            let hash;
-
-            if (!externalHash) {
-                hash = decodeURIComponent(window.location.hash);
-                if (!this.startWithHashRoute(hash)) {
-                    window.location.hash = '';
-                }
-            } else {
-                hash = decodeURIComponent(externalHash);
-                this.removeHashFromSilentIframe();
-                this.destroyIframe();
-            }
-
-            if (this.hasHashCharacter(hash) && !this.startWithHashRoute(hash)) {
-                const questionMarkPosition = hash.indexOf('?');
-
-                if (questionMarkPosition > -1) {
-                    hash = hash.substr(questionMarkPosition + 1);
-                } else {
-                    hash = hash.substr(1);
-                }
-                hashFragmentParams = this.parseQueryString(hash);
-            }
-        }
-        return hashFragmentParams;
-    }
-
     parseQueryString(queryString: string): any {
         const data: { [key: string]: Object } = {};
         let pairs, pair, separatorIndex, escapedKey, escapedValue, key, value;
@@ -389,97 +215,12 @@ export class Oauth2Auth0 extends Oauth2Auth {
 
     /**
      * login Alfresco API
-     * @returns {Promise} A promise that returns {new authentication token} if resolved and {error} if rejected.
+     * returns {Promise} A promise that returns {new authentication token} if resolved and {error} if rejected.
      */
     login(username: string, password: string): Promise<any> {
         return new Promise((resolve, reject) => {
             this.grantPasswordLogin(username, password, resolve, reject);
         });
-    }
-
-    grantPasswordLogin(username: string, password: string, resolve: any, reject: any) {
-        const postBody = {}, pathParams = {}, queryParams = {};
-
-        const headerParams = {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        };
-
-        const formParams = {
-            username: username,
-            password: password,
-            grant_type: 'password',
-            client_id: this.config.oauth2.clientId
-        };
-
-        const contentTypes = ['application/x-www-form-urlencoded'];
-        const accepts = ['application/json'];
-
-        const promise = this.callCustomApi(
-            this.discovery.tokenEndpoint, 'POST',
-            pathParams, queryParams, headerParams, formParams, postBody,
-            contentTypes, accepts
-        ).then(
-            (data: any) => {
-                this.saveUsername(username);
-                this.storeAccessToken(data.access_token, data.expires_in, data.refresh_token);
-                this.silentRefresh();
-                resolve(data);
-            },
-            (error) => {
-                if (error.error && error.error.status === 401) {
-                    this.emit('unauthorized');
-                }
-                this.emit('error');
-                reject(error.error);
-            });
-
-        ee(promise); // jshint ignore:line
-    }
-
-    /**
-     * Refresh the  Token
-     */
-    refreshToken(): Promise<any> {
-        const postBody = {}, pathParams = {}, formParams = {};
-
-        const auth = 'Basic ' + btoa(this.config.oauth2.clientId + ':' + this.config.oauth2.secret);
-
-        const headerParams = {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Cache-Control': 'no-cache',
-            'Authorization': auth
-        };
-
-        const queryParams = {
-            refresh_token: this.authentications.oauth2.refreshToken,
-            grant_type: 'refresh_token'
-        };
-
-        const contentTypes = ['application/x-www-form-urlencoded'];
-        const accepts = ['application/json'];
-
-        const promise = new Promise((resolve, reject) => {
-            this.callCustomApi(
-                this.discovery.tokenEndpoint, 'POST',
-                pathParams, queryParams, headerParams, formParams, postBody,
-                contentTypes, accepts
-            ).then(
-                (data: any) => {
-                    this.setToken(data.access_token, data.refresh_token);
-                    resolve(data);
-                },
-                (error) => {
-                    if (error.error.status === 401) {
-                        this.emit('unauthorized');
-                    }
-                    this.emit('error');
-                    reject(error.error);
-                });
-        });
-
-        ee(promise); // jshint ignore:line
-
-        return promise;
     }
 
     /**
@@ -504,15 +245,6 @@ export class Oauth2Auth0 extends Oauth2Auth {
     }
 
     /**
-     * return the Authentication
-     *
-     * @returns {Object} authentications
-     */
-    getAuthentication(): Authentication {
-        return this.authentications;
-    }
-
-    /**
      * Change the Host
      */
     changeHost(host: string) {
@@ -522,10 +254,16 @@ export class Oauth2Auth0 extends Oauth2Auth {
     /**
      * If the client is logged in return true
      *
-     * @returns {Boolean} is logged in
+     * returns {Boolean} is logged in
      */
     isLoggedIn(): boolean {
-        return !!this.authentications.oauth2.accessToken;
+        // return !!this.authentications.oauth2.accessToken;
+
+        this.auth0Service.isAuthenticated$.subscribe( () => {
+            return true;
+        }
+        );
+
     }
 
     /**

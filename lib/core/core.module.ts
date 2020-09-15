@@ -58,6 +58,7 @@ import { directionalityConfigFactory } from './services/directionality-config-fa
 import { DirectionalityConfigService } from './services/directionality-config.service';
 import { SearchTextModule } from './search-text/search-text-input.module';
 
+
 @NgModule({
     imports: [
         TranslateModule,
